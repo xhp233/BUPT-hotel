@@ -26,6 +26,19 @@
         });
 
         function requestData() {
+            var statusMap = {
+                'running': '运行中',
+                'waiting': '等待中',
+                'stopped': '已停止',
+                '': ''
+            };
+
+            var speedMap = {
+                'low': '低',
+                'mid': '中',
+                'high': '高',
+                '': ''
+            };
             $.ajax({
                 url: '/manager/data/',  // 请求数据的 URL
                 type: 'GET',
@@ -38,10 +51,10 @@
                         var item = data[i];
                         html += '<div class="sub_window m-2 p-2 border rounded" style="' + getBackgroundColor(item.status) + '">';
                         html += '<p>房间号: ' + item.roomNo_id + '</p>';
-                        html += '<p>状态: ' + item.status + '</p>';
+                        html += '<p>状态: ' + statusMap[item.status] + '</p>';
                         html += '<p>当前温度: ' + item.current_temperature + '</p>';
                         html += '<p>目标温度: ' + item.target_temperature + '</p>';
-                        html += '<p>风速: ' + item.speed + '</p>';
+                        html += '<p>风速: ' + speedMap[item.speed] + '</p>';
                         html += '</div>';
                     }
                     $('#grid_layout').html(html);

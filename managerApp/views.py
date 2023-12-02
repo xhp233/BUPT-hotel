@@ -156,18 +156,20 @@ def manager_get_data(request):
 def central_AC(request):
     if request.method == 'GET':
         centralAC_info = CentralAC.objects.get()
-        # print('centralAC_mode:', centralAC_info.centralAC_mode)
-        # print('centralAC_status:', centralAC_info.centralAC_status)
-        # print('max_temperature:', centralAC_info.max_temperature)
-        # print('min_temperature:', centralAC_info.min_temperature)
-        # print('low_speed_fee:', centralAC_info.low_speed_fee)
-        # print('mid_speed_fee:', centralAC_info.mid_speed_fee)
-        # print('high_speed_fee:', centralAC_info.high_speed_fee)
-        context = {'centralAC_info': centralAC_info}
-        context = {'centralAC_info': centralAC_info}
+        mode_map = {
+            'cool': '制冷',
+            'heat': '制热'
+        }
+        context = {
+            'centralAC_info': centralAC_info,
+            'mode_map': mode_map
+        }
+
         return render(request, 'central_AC.html', context)
     else:
         return JsonResponse({'message': '请求方法错误'})
+    
+
 
 @login_required
 def open_central_AC(request):
@@ -175,18 +177,13 @@ def open_central_AC(request):
         mode = request.POST.get('mode')
         max_temperature = request.POST.get('max_temperature')
         min_temperature = request.POST.get('min_temperature')
-        low_speed_fee = request.POST.get('low_speed_fee')
-        mid_speed_fee = request.POST.get('mid_speed_fee')
-        high_speed_fee = request.POST.get('high_speed_fee')
-
+        speed_fee = request.POST.get('speed_fee')
         centralAC_info = CentralAC.objects.get()
         centralAC_info.centralAC_status = 'on'
         centralAC_info.centralAC_mode = mode
         centralAC_info.max_temperature = max_temperature
         centralAC_info.min_temperature = min_temperature
-        centralAC_info.low_speed_fee = low_speed_fee
-        centralAC_info.mid_speed_fee = mid_speed_fee
-        centralAC_info.high_speed_fee = high_speed_fee
+        centralAC_info.speed_fee = speed_fee
         centralAC_info.save()
 
         return redirect('/manager/centralAC/')

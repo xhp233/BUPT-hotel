@@ -34,29 +34,19 @@
                 <input type="text" id="min_temperature" name="min_temperature" value="16"><br>
             </div>
             <div class="form-group">
-                <label for="low_speed_fee">低风速费用:</label><br>
-                <input type="text" id="low_speed_fee" name="low_speed_fee" value="0.5"><br>
-            </div>
-            <div class="form-group">
-                <label for="mid_speed_fee">中风速费用:</label><br>
-                <input type="text" id="mid_speed_fee" name="mid_speed_fee" value="1"><br>
-            </div>
-            <div class="form-group">
-                <label for="high_speed_fee">高风速费用:</label><br>
-                <input type="text" id="high_speed_fee" name="high_speed_fee" value="2"><br>
+                <label for="speed_fee">风速费用:</label><br>
+                <input type="text" id="speed_fee" name="speed_fee" value="1"><br>
             </div>
             <button type="submit" class="btn btn-primary">开启</button>
         </form>
     {% elif centralAC_info.centralAC_status == 'on' %}
+        <div id="info"></div>
         <form method="post" action="/manager/centralAC/close/">
             {% csrf_token %}
-            <p>当前状态: {{ centralAC_info.centralAC_status }}</p>
             <p>当前模式: {{ centralAC_info.centralAC_mode }}</p>
             <p>当前最高温度: {{ centralAC_info.max_temperature }}</p>
             <p>当前最低温度: {{ centralAC_info.min_temperature }}</p>
-            <p>当前低风速费用: {{ centralAC_info.low_speed_fee }}</p>
-            <p>当前中风速费用: {{ centralAC_info.mid_speed_fee }}</p>
-            <p>当前高风速费用: {{ centralAC_info.high_speed_fee }}</p>
+            <p>当前每度费用: {{ centralAC_info.speed_fee }}</p>
             <button type="submit" class="btn btn-primary">关闭</button>
         </form>
     {% endif %}

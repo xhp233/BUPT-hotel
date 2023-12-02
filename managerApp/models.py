@@ -18,9 +18,7 @@ class CentralAC(models.Model):
     centralAC_status = models.CharField(max_length=50,default='',choices=STATUS_CHOICES) # on or off
     max_temperature = models.CharField(max_length=50,default='')
     min_temperature = models.CharField(max_length=50,default='')
-    low_speed_fee = models.CharField(max_length=50,default='')
-    mid_speed_fee = models.CharField(max_length=50,default='')
-    high_speed_fee = models.CharField(max_length=50,default='')
+    speed_fee = models.CharField(max_length=50,default='')
     default_target_temperature = models.CharField(max_length=50,default='')
 
     class Meta:

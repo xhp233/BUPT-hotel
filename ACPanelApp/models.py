@@ -17,9 +17,9 @@ class Room(models.Model):
 
 class ACinfo(models.Model):
     STATUS_CHOICES = (
-        ('running', '运行中'),
-        ('stopped', '已停止'),
-        ('waiting', '等待中'),
+        ('running', 'running'),
+        ('stopped', 'stopped'),
+        ('waiting', 'waiting'),
     )
 
     SPEED_CHOICES = (

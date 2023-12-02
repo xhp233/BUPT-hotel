@@ -31,9 +31,7 @@ def create_central_AC():
             centralAC_status='off',
             max_temperature='30',
             min_temperature='18',
-            low_speed_fee='1',
-            mid_speed_fee='2',
-            high_speed_fee='3',
+            speed_fee='1',
             default_target_temperature='25'
         )
         print('create central AC success')
@@ -76,3 +74,4 @@ create_admin()
 create_ACadmin()
 create_room()
 init_AC_info()
+print("\nServer activate success\n")
