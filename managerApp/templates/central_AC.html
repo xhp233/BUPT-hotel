@@ -34,7 +34,7 @@
                 <input type="text" id="min_temperature" name="min_temperature" value="16"><br>
             </div>
             <div class="form-group">
-                <label for="speed_fee">风速费用:</label><br>
+                <label for="speed_fee">每度费用:</label><br>
                 <input type="text" id="speed_fee" name="speed_fee" value="1"><br>
             </div>
             <button type="submit" class="btn btn-primary">开启</button>
@@ -43,7 +43,7 @@
         <div id="info"></div>
         <form method="post" action="/manager/centralAC/close/">
             {% csrf_token %}
-            <p>当前模式: {{ centralAC_info.centralAC_mode }}</p>
+            <p>当前模式: {{ mode }}</p>
             <p>当前最高温度: {{ centralAC_info.max_temperature }}</p>
             <p>当前最低温度: {{ centralAC_info.min_temperature }}</p>
             <p>当前每度费用: {{ centralAC_info.speed_fee }}</p>

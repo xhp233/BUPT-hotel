@@ -142,6 +142,8 @@ AUTH_USER_MODEL = 'serverApp.CustomUser'
 
 # LOGIN_REDIRECT_URL = '../'
 
-STATIC_URL = 'static/'
-
 ALLOWED_HOSTS = ['10.129.205.73', 'localhost', '127.0.0.1']
+
+# STATICFILES_DIRS = [
+#     BASE_DIR / 'managerApp/static',
+# ]

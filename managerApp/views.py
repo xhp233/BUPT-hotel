@@ -162,7 +162,7 @@ def central_AC(request):
         }
         context = {
             'centralAC_info': centralAC_info,
-            'mode_map': mode_map
+            'mode': mode_map[centralAC_info.centralAC_mode]
         }
 
         return render(request, 'central_AC.html', context)
