@@ -52,26 +52,37 @@ def create_ACadmin():
         return
     print('ACadmin already exists')
 
-def create_room():
+def create_room(num_of_rooms):
     try:
-        for i in range(1, 41):
+        # 删除所有Room对象
+        Room.objects.all().delete()
+    finally:
+        pass
+    try:        
+        for i in range(1, num_of_rooms + 1):
             Room.objects.create(roomNo=i, room_status='empty')
         print('create rooms success')
     except:
         print('rooms already exists')
     
-def init_AC_info():
+def init_AC_info(num_of_rooms):
     try:
-        for i in range(1, 41):
+        # 删除所有ACinfo对象
+        ACinfo.objects.all().delete()
+    finally:
+        pass
+    try:  
+        for i in range(1, num_of_rooms + 1):
             room = Room.objects.get(roomNo=i)
             ACinfo.objects.create(roomNo=room, status='stopped')
         print('create AC info success')
     except:
         print('AC info already exists')
 
+num_of_rooms = 5
 create_central_AC()
 create_admin()
 create_ACadmin()
-create_room()
-init_AC_info()
+create_room(num_of_rooms)
+init_AC_info(num_of_rooms)
 print("\nServer activate success\n")

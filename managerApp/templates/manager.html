@@ -15,7 +15,7 @@
                 <button id="logoutButton" class="btn btn-secondary">退出登录</button>
             </div>
         </div>
-        <div id="grid_layout" class="d-flex flex-wrap small"></div>
+        <div id="grid_layout" class="container"></div>
     </div>
 
 
@@ -46,17 +46,24 @@
                     $('#label').text('数据请求成功');
                     // 假设服务器返回的数据是一个包含多个房间信息的数组
                     var data = response.data;
-                    var html = '';
+                    var html = '<div class="row">';
                     for (var i = 0; i < data.length; i++) {
                         var item = data[i];
+                        html += '<div class="col-4">';
                         html += '<div class="sub_window m-2 p-2 border rounded" style="' + getBackgroundColor(item.status) + '">';
                         html += '<p>房间号: ' + item.roomNo_id + '</p>';
                         html += '<p>状态: ' + statusMap[item.status] + '</p>';
                         html += '<p>当前温度: ' + item.current_temperature + '</p>';
                         html += '<p>目标温度: ' + item.target_temperature + '</p>';
                         html += '<p>风速: ' + speedMap[item.speed] + '</p>';
+                        html += '<p>费用: ' + item.fee + '</p>';
                         html += '</div>';
+                        html += '</div>';
+                        if ((i + 1) % 3 == 0) {
+                            html += '</div><div class="row">';
+                        }
                     }
+                    html += '</div>';
                     $('#grid_layout').html(html);
                 },
                 error: function() {

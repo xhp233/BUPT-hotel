@@ -33,6 +33,7 @@ class ACinfo(models.Model):
     current_temperature = models.CharField(max_length=50,default='')
     target_temperature = models.CharField(max_length=50,default='')
     speed = models.CharField(max_length=50,default='',choices=SPEED_CHOICES)# low, mid, high
+    fee = models.CharField(max_length=50,default='')
 
     class Meta:
         db_table = 'acinfo'

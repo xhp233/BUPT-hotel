@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-from managerApp.models import  CentralAC
+from managerApp.models import CentralAC
 from ACPanelApp.models import ACinfo
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.shortcuts import render, redirect
