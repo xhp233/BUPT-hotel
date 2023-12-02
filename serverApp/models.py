@@ -6,7 +6,7 @@ from django.db import models
 
 class CustomUser(AbstractUser):
     ROLE_CHOICES = [
-        ('frontdesk', 'frontdesk'),
+        ('receptionist', 'receptionist'),
         ('acmanager', 'acmanager'),
         ('manager', 'manager'),
         ('resident', 'resident'),

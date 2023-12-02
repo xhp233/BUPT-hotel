@@ -7,15 +7,16 @@
     <script src="{% static 'js/jquery.min.js' %}"></script>
 </head>
 <body>
-    <div class="container-fluid">
+    <div class="container">
         <div class="d-flex justify-content-between align-items-center my-3">
-            <h2 id="label">正在请求数据</h2>
+            <h2 id="label0">中控室监控</h2>
             <div>
                 <button id="centralACButton" class="btn btn-primary mr-2">切换到中央空调</button>
                 <button id="logoutButton" class="btn btn-secondary">退出登录</button>
             </div>
         </div>
         <div id="grid_layout" class="container"></div>
+        <div id="label1">数据请求中</div>
     </div>
 
 
@@ -43,7 +44,7 @@
                 url: '/manager/data/',  // 请求数据的 URL
                 type: 'GET',
                 success: function(response) {
-                    $('#label').text('数据请求成功');
+                    $('#label1').text('数据请求成功');
                     // 假设服务器返回的数据是一个包含多个房间信息的数组
                     var data = response.data;
                     var html = '<div class="row">';
@@ -67,7 +68,7 @@
                     $('#grid_layout').html(html);
                 },
                 error: function() {
-                    $('#label').text('服务器无响应');
+                    $('#label1').text('服务器无响应');
                 }
             });
         }

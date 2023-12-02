@@ -6,11 +6,10 @@ class Room(models.Model):
     STATUS_CHOICES = (
         ('empty', 'empty'),
         ('occupied', 'occupied'),
-        ('booked', 'booked'),
     )
 
     roomNo = models.CharField(max_length=50,primary_key=True)
-    room_status = models.CharField(max_length=50,default='',choices=STATUS_CHOICES)# empty, occupied, booked
+    room_status = models.CharField(max_length=50,default='',choices=STATUS_CHOICES)# empty, occupied
 
     class Meta:
         db_table = 'room'

@@ -7,39 +7,48 @@
     <script src="{% static 'js/jquery.min.js' %}"></script>
 </head>
 <body>
-    <div class="container-fluid">
+    <div class="container">
         <div class="d-flex justify-content-between align-items-center my-3">
-            <h2 id="label">当前状态: {{ centralAC_info.centralAC_status }}</h2>
+            <h2 id="label">当前状态: {{ status }}</h2>
             <div>
                 <button id="ACinfoButton" class="btn btn-primary mr-2">切换到客房空调</button>
                 <button id="logoutButton" class="btn btn-secondary">退出登录</button>
             </div>
         </div>
-        {% if centralAC_info.centralAC_status == 'off' %}
+        {% if status == '关闭' %}
         <form method="post" action="/manager/centralAC/open/">
             {% csrf_token %}
-            <div class="form-group">
-                <label for="mode">模式:</label>
-                <select id="mode" name="mode" class="form-control">
-                    <option value="cool">制冷</option>
-                    <option value="heat">制热</option>
-                </select>
+            <div class="form-group row">
+                <label for="mode" class="col-sm-2 col-form-label">模式:</label>
+                <div class="col-sm-10">
+                    <select id="mode" name="mode" class="form-control">
+                        <option value="cool">制冷</option>
+                        <option value="heat">制热</option>
+                    </select> 
+                </div>
+                
             </div>
-            <div class="form-group">
-                <label for="max_temperature">最高温度:</label><br>
-                <input type="text" id="max_temperature" name="max_temperature" value="24"><br>
+            <div class="form-group row">
+                <label for="max_temperature" class="col-sm-2 col-form-label">最高温度:</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="max_temperature" name="max_temperature" value="24">
+                </div>
             </div>
-            <div class="form-group">
-                <label for="min_temperature">最低温度:</label><br>
-                <input type="text" id="min_temperature" name="min_temperature" value="16"><br>
+            <div class="form-group row">
+                <label for="min_temperature" class="col-sm-2 col-form-label">最低温度:</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="min_temperature" name="min_temperature" value="16">
+                </div>
             </div>
-            <div class="form-group">
-                <label for="speed_fee">每度费用:</label><br>
-                <input type="text" id="speed_fee" name="speed_fee" value="1"><br>
+            <div class="form-group row">
+                <label for="speed_fee" class="col-sm-2 col-form-label">每度费用:</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="speed_fee" name="speed_fee" value="1">
+                </div>                
             </div>
             <button type="submit" class="btn btn-primary">开启</button>
         </form>
-    {% elif centralAC_info.centralAC_status == 'on' %}
+    {% elif status == '开启' %}
         <div id="info"></div>
         <form method="post" action="/manager/centralAC/close/">
             {% csrf_token %}
@@ -54,11 +63,9 @@
         document.querySelector('form').addEventListener('submit', function(event) {
             var max_temperature = document.getElementById('max_temperature').value;
             var min_temperature = document.getElementById('min_temperature').value;
-            var low_speed_fee = document.getElementById('low_speed_fee').value;
-            var mid_speed_fee = document.getElementById('mid_speed_fee').value;
-            var high_speed_fee = document.getElementById('high_speed_fee').value;
+            var speed_fee = document.getElementById('speed_fee').value;
 
-            if (!isNumeric(max_temperature) || !isNumeric(min_temperature) || !isNumeric(low_speed_fee) || !isNumeric(mid_speed_fee) || !isNumeric(high_speed_fee)) {
+            if (!isNumeric(max_temperature) || !isNumeric(min_temperature) || !isNumeric(speed_fee)) {
                 alert('温度和费用必须为数字');
                 event.preventDefault();
             } else if (parseFloat(min_temperature) > parseFloat(max_temperature)) {

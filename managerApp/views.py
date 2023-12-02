@@ -160,9 +160,14 @@ def central_AC(request):
             'cool': '制冷',
             'heat': '制热'
         }
+        status_map = {
+            'on': '开启',
+            'off': '关闭'
+        }
         context = {
             'centralAC_info': centralAC_info,
-            'mode': mode_map[centralAC_info.centralAC_mode]
+            'mode': mode_map[centralAC_info.centralAC_mode],
+            'status': status_map[centralAC_info.centralAC_status]
         }
 
         return render(request, 'central_AC.html', context)
