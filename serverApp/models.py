@@ -12,7 +12,7 @@ class CustomUser(AbstractUser):
         ('resident', 'resident'),
     ]
 
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
 
     class Meta:
         db_table = 'customuser'
