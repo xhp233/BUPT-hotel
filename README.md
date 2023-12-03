@@ -1,16 +1,8 @@
 # 运行服务器
 
-运行python manage.py runserver
+先运行deleteDB.bat，然后再运行runserver.bat
 
-如果失败，建议重置数据库，即：
-
-1. 将每个App下的migrations文件夹下名如0001_initial.py、0002_....py的文件删除
-2. 删除根目录下的software_engineering文件
-3. 运行python manage.py makemigrations
-4. 运行python manage.py migrate
-5. 运行python manage.py runserver
-
-# 默认账号
+# 默认账号密码
 
 管理员：admin admin
 
