@@ -4,8 +4,8 @@ from django.db import models
 
 class Room(models.Model):
     STATUS_CHOICES = (
-        ('empty', 'empty'),
-        ('occupied', 'occupied'),
+        ('empty', '空闲'),
+        ('occupied', '占用'),
     )
 
     roomNo = models.CharField(max_length=50,primary_key=True)
@@ -16,15 +16,15 @@ class Room(models.Model):
 
 class ACinfo(models.Model):
     STATUS_CHOICES = (
-        ('running', 'running'),
-        ('stopped', 'stopped'),
-        ('waiting', 'waiting'),
+        ('running', '运行中'),
+        ('stopped', '已停止'),
+        ('waiting', '等待中'),
     )
 
     SPEED_CHOICES = (
-        ('low', 'low'),
-        ('mid', 'mid'),
-        ('high', 'high'),
+        ('low', '低'),
+        ('mid', '中'),
+        ('high', '高'),
     )
 
     roomNo = models.OneToOneField(Room, on_delete=models.CASCADE, primary_key=True)

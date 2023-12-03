@@ -15,12 +15,16 @@ def manager_get_data(request):
     if request.method == 'GET':
         data = ACinfo.objects.all()
         data = list(data.values())
+        # 将status转换为中文
+        for ac in data:
+            ac['status'] = ACinfo.objects.get(roomNo=ac['roomNo_id']).get_status_display()
+            ac['speed'] = ACinfo.objects.get(roomNo=ac['roomNo_id']).get_speed_display()
         # 将温度费用保留两位小数
-        for item in data:
+        for ac in data:
             try:
-                item['current_temperature'] = round(float(item['current_temperature']), 2)
-                item['target_temperature'] = round(float(item['target_temperature']), 2)
-                item['fee'] = round(float(item['fee']), 2)
+                ac['fee'] = round(float(ac['fee']), 2)
+                ac['target_temperature'] = ACinfo.objects.get(roomNo=ac['roomNo_id']).target_temperature
+                ac['current_temperature'] = ACinfo.objects.get(roomNo=ac['roomNo_id']).current_temperature
             except:
                 pass
         return JsonResponse({'data': data})
@@ -32,18 +36,10 @@ def central_AC(request):
     if request.method == 'GET':
         # param = request.GET.get('param')
         centralAC_info = CentralAC.objects.get()
-        mode_map = {
-            'cool': '制冷',
-            'heat': '制热'
-        }
-        status_map = {
-            'on': '开启',
-            'off': '关闭'
-        }
         context = {
             'centralAC_info': centralAC_info,
-            'mode': mode_map[centralAC_info.centralAC_mode],
-            'status': status_map[centralAC_info.centralAC_status],
+            'mode': centralAC_info.get_centralAC_mode_display(),
+            'status': centralAC_info.get_centralAC_status_display(),
             # 'param': param
         }
         return render(request, 'central_AC.html', context)

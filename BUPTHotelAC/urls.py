@@ -24,7 +24,6 @@ urlpatterns = [
     path('admin/', admin.site.urls, name='admin'),
     path('login/', server_views.MyLoginView.as_view(), name='login'),
     path('logout/', server_views.MyLogoutView.as_view(), name='logout'),
-    path('register/', server_views.register_view, name='register'),
     path('manager/', manager_views.manager, name='ACmanager'),
 
     path('receptionist/', server_views.receptionist_view, name='receptionist'),#添加URL模式

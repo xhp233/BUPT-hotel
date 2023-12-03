@@ -6,13 +6,13 @@ from django.db import models
 
 class CustomUser(AbstractUser):
     ROLE_CHOICES = [
-        ('frontdesk', 'frontdesk'),
+        ('receptionist', 'receptionist'),
         ('acmanager', 'acmanager'),
         ('manager', 'manager'),
         ('resident', 'resident'),
     ]
 
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
 
     class Meta:
         db_table = 'customuser'
@@ -25,6 +25,7 @@ class ACrecorddetail(models.Model):
     target_temperature = models.CharField(max_length=50,default='')
     speed = models.CharField(max_length=50,default='')
     time = models.DateTimeField(auto_now=True)
+    fee = models.CharField(max_length=50,default='')
 
     class Meta:
         db_table = 'ac_record_detail'

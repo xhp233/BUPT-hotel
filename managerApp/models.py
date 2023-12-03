@@ -5,13 +5,13 @@ from ACPanelApp.models import Room
 
 class CentralAC(models.Model):
     MODE_CHOICES = (
-        ('cool', 'cool'),
-        ('heat', 'heat'),
+        ('cool', '制冷'),
+        ('heat', '制热'),
     )
 
     STATUS_CHOICES = (
-        ('on', 'on'),
-        ('off', 'off'),
+        ('on', '开启'),
+        ('off', '关闭'),
     )
 
     centralAC_mode = models.CharField(max_length=50,default='',choices=MODE_CHOICES) # cool or heat

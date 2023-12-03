@@ -3,11 +3,6 @@ from django.http import HttpResponse
 from .models import ACinfo
 import time
 
-STATUS_MAP = {
-    'running': '开机',
-    'stopped': '关机',
-}
-
 def controls(request, room_no):
     ac_instance = ACinfo.objects.get(roomNo=room_no)
     context = {
@@ -16,7 +11,7 @@ def controls(request, room_no):
         'current_temperature': ac_instance.current_temperature,
         'speed': ac_instance.speed,
         'fee': ac_instance.fee,
-        'status': STATUS_MAP[ac_instance.status],
+        'status': ac_instance.get_status_display(),
         }
     return render(request, 'controls.html', context)
 

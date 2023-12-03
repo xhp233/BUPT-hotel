@@ -28,18 +28,6 @@
         });
 
         function requestData() {
-            var statusMap = {
-                'running': '运行中',
-                'waiting': '等待中',
-                'stopped': '已停止',
-                '': ''
-            };
-            var speedMap = {
-                'low': '低',
-                'mid': '中',
-                'high': '高',
-                '': ''
-            };
             $.ajax({
                 url: '/manager/data/',  // 请求数据的 URL
                 type: 'GET',
@@ -53,10 +41,10 @@
                         html += '<div class="col-4">';
                         html += '<div class="sub_window m-2 p-2 border rounded" style="' + getBackgroundColor(item.status) + '">';
                         html += '<p>房间号: ' + item.roomNo_id + '</p>';
-                        html += '<p>状态: ' + statusMap[item.status] + '</p>';
+                        html += '<p>状态: ' + item.status + '</p>';
                         html += '<p>当前温度: ' + item.current_temperature + '</p>';
                         html += '<p>目标温度: ' + item.target_temperature + '</p>';
-                        html += '<p>风速: ' + speedMap[item.speed] + '</p>';
+                        html += '<p>风速: ' + item.speed + '</p>';
                         html += '<p>费用: ' + item.fee + '</p>';
                         html += '</div>';
                         html += '</div>';
@@ -75,13 +63,11 @@
 
         function getBackgroundColor(status) {
             switch (status) {
-                case 'running':
+                case '运行中':
                     return 'background-color: rgba(144, 238, 144, 0.5);';
-                case 'ERROR':
-                    return 'background-color: rgba(255, 102, 102, 0.5);';
-                case 'waiting':
+                case '等待中':
                     return 'background-color: rgba(255, 255, 102, 0.5);';
-                case 'stopped':
+                case '已停止':
                     return 'background-color: rgba(150, 150, 150, 0.5);';
                 default:
                     return 'background-color: white;';
