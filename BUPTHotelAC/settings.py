@@ -90,7 +90,7 @@ WSGI_APPLICATION = 'BUPTHotelAC.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'software_engineering',
+        'NAME': 'BUPTHotelAC.db',
     }
 }
 

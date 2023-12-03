@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import ACinfo
-# import requests  # Import the requests library for making HTTP requests
 import time
 
 STATUS_MAP = {
