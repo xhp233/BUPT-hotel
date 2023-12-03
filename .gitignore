@@ -1,0 +1,11 @@
+managerApp/__pycache__
+BUPTHotelAC/__pycache__
+ACPanelApp/__pycache__
+serverApp/__pycache__
+serverApp/migrations/*
+!serverApp/migrations/__init__.py
+managerApp/migrations/*
+!managerApp/migrations/__init__.py
+ACPanelApp/migrations/*
+!ACPanelApp/migrations/__init__.py
+BUPTHotelAC.db
