@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from managerApp import views as manager_views
 from serverApp import views as server_views
-
+from ACPanelApp import views as ACPanelApp_views
 
 urlpatterns = [
     path('', server_views.hello, name='hello'),
@@ -25,6 +25,7 @@ urlpatterns = [
     path('login/', server_views.MyLoginView.as_view(), name='login'),
     path('logout/', server_views.MyLogoutView.as_view(), name='logout'),
     path('register/', server_views.register_view, name='register'),
+
     path('manager/', manager_views.manager, name='ACmanager'),
     path('manager/data/', manager_views.manager_get_data),
     path('manager/centralAC/open/', manager_views.open_central_AC),
@@ -37,6 +38,4 @@ urlpatterns = [
     path('adjust_temperature/<int:room_no>/<int:target_temp>/', ACPanelApp_views.adjust_temperature, name='adjust_temperature'),
     path('adjust_speed/<int:room_no>/<str:speed>/', ACPanelApp_views.adjust_speed, name='adjust_speed'),
     path('temperature_control/<int:room_no>/', ACPanelApp_views.temperature_control, name='temperature_control'),
-
-    
 ]
