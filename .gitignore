@@ -8,4 +8,4 @@ managerApp/migrations/*
 !managerApp/migrations/__init__.py
 ACPanelApp/migrations/*
 !ACPanelApp/migrations/__init__.py
-software_engineering
+BUPTHotelAC.db
