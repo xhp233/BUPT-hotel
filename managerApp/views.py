@@ -30,6 +30,7 @@ def manager_get_data(request):
 @login_required
 def central_AC(request):
     if request.method == 'GET':
+        # param = request.GET.get('param')
         centralAC_info = CentralAC.objects.get()
         mode_map = {
             'cool': '制冷',
@@ -42,7 +43,8 @@ def central_AC(request):
         context = {
             'centralAC_info': centralAC_info,
             'mode': mode_map[centralAC_info.centralAC_mode],
-            'status': status_map[centralAC_info.centralAC_status]
+            'status': status_map[centralAC_info.centralAC_status],
+            # 'param': param
         }
         return render(request, 'central_AC.html', context)
     else:
