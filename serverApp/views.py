@@ -9,6 +9,8 @@ class MyLoginView(LoginView):
 
     def form_valid(self, form):
         response = super().form_valid(form)
+        if self.request.user.is_superuser:
+            return redirect('../admin/')
         if self.request.user.role == 'acmanager':
             return redirect('ACmanager')
         elif self.request.user.role == 'manager':
@@ -16,9 +18,7 @@ class MyLoginView(LoginView):
         elif self.request.user.role == 'frontdesk':
             return redirect('Front Desk')
         elif self.request.user.role == 'resident':
-            return redirect('Resident')
-        if self.request.user.is_superuser:
-            return redirect('../admin/')
+            return redirect('Resident')        
         return response
 
 class MyLogoutView(LogoutView):

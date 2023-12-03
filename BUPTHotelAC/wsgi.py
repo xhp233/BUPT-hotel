@@ -113,8 +113,9 @@ def change_temperature(rooms, acs, mode, status):
                 target_temperature = float(ac.target_temperature)
                 if current_temperature == target_temperature:
                     continue
-                speed = SPEED_TEMP_MAP[ac.speed] * diff
+                speed = SPEED_TEMP_MAP[ac.speed] * diff # 温度变化量
                 current_temperature += speed
+                ac.fee = str(float(ac.fee) + min(abs(speed), abs(current_temperature - target_temperature)))
                 if speed > 0: # heat                    
                     if current_temperature >= target_temperature:
                         current_temperature = target_temperature

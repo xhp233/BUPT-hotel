@@ -15,6 +15,14 @@ def manager_get_data(request):
     if request.method == 'GET':
         data = ACinfo.objects.all()
         data = list(data.values())
+        # 将温度费用保留两位小数
+        for item in data:
+            try:
+                item['current_temperature'] = round(float(item['current_temperature']), 2)
+                item['target_temperature'] = round(float(item['target_temperature']), 2)
+                item['fee'] = round(float(item['fee']), 2)
+            except:
+                pass
         return JsonResponse({'data': data})
     else:
         return JsonResponse({'message': '请求方法错误'})
@@ -67,6 +75,12 @@ def close_central_AC(request):
             return JsonResponse({'message': '中央空调未开启'})
         central_AC.centralAC_status = 'off'
         central_AC.save()
+        acs = ACinfo.objects.all()
+        for ac in acs:
+            ac.status = 'stopped'
+            ac.target_temperature = ''
+            ac.speed = ''
+            ac.save()
         return redirect('/manager/centralAC/')
     else:
         return JsonResponse({'message': '请求方法错误'})
