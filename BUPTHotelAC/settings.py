@@ -90,7 +90,7 @@ WSGI_APPLICATION = 'BUPTHotelAC.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'software_engineering',
+        'NAME': 'BUPTHotelAC.db',
     }
 }
 
@@ -145,5 +145,5 @@ AUTH_USER_MODEL = 'serverApp.CustomUser'
 ALLOWED_HOSTS = ['10.129.205.73', 'localhost', '127.0.0.1']
 
 # STATICFILES_DIRS = [
-#     BASE_DIR / 'managerApp/static',
+#     BASE_DIR
 # ]

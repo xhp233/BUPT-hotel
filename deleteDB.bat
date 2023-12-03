@@ -53,4 +53,4 @@ for %%A in (BUPTHotelAC\__pycache__\*) do (
 )
 rd BUPTHotelAC\__pycache__
 
-del software_engineering
+del BUPTHotelAC.db
