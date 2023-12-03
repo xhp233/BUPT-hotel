@@ -90,7 +90,7 @@ WSGI_APPLICATION = 'BUPTHotelAC.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'BUPTHotelAC.db',
+        'NAME': 'software_engineering',
     }
 }
 
@@ -142,8 +142,14 @@ AUTH_USER_MODEL = 'serverApp.CustomUser'
 
 # LOGIN_REDIRECT_URL = '../'
 
+STATIC_URL = 'static/'
+
 ALLOWED_HOSTS = ['10.129.205.73', 'localhost', '127.0.0.1']
 
-# STATICFILES_DIRS = [
-#     BASE_DIR
-# ]
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'managerApp/static',
+]
+
+LOGIN_REDIRECT_URL = '/receptionist/'
