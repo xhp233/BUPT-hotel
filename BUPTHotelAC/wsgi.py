@@ -132,7 +132,8 @@ def change_temperature(rooms, acs, mode, status):
 
 def check_temperature():
     while True:
-        print('check temperature')
+        # 打印时间
+        print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), '更新信息')
         time.sleep(3)
         centralAC = CentralAC.objects.get()
         rooms = Room.objects.all()

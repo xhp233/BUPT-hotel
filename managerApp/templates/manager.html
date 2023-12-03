@@ -12,8 +12,8 @@
         <div class="d-flex justify-content-between align-items-center my-3">
             <h2 id="label0">中控室监控</h2>
             <div>
-                <button id="centralACButton" class="btn btn-primary mr-2">切换到中央空调</button>
-                <button id="logoutButton" class="btn btn-secondary">退出登录</button>
+                <a href="centralAC/" class="btn btn-primary">切换到中央空调</a>
+                <a href="../logout/" class="btn btn-secondary">退出登录</a>
             </div>
         </div>
         <div id="grid_layout" class="container"></div>
@@ -87,16 +87,6 @@
                     return 'background-color: white;';
             }
         }
-
-        $('#logoutButton').click(function() {
-            window.location.href = '../logout/';
-        });
-
-        $('#centralACButton').click(function() {
-            // window.location.href = 'centralAC/?param=1';
-            console.log('click');
-            window.location.href = 'centralAC/';
-        });
     </script>
 </body>
 </html>

@@ -25,6 +25,7 @@ class ACrecorddetail(models.Model):
     target_temperature = models.CharField(max_length=50,default='')
     speed = models.CharField(max_length=50,default='')
     time = models.DateTimeField(auto_now=True)
+    fee = models.CharField(max_length=50,default='')
 
     class Meta:
         db_table = 'ac_record_detail'
