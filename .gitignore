@@ -1,7 +1,7 @@
-managerApp\__pycache__
-BUPTHotelAC\__pycache__
-ACPanelApp\__pycache__
-serverApp\__pycache__
+managerApp\__pycache__\*
+BUPTHotelAC\__pycache__\*
+ACPanelApp\__pycache__\*
+serverApp\__pycache__\*
 serverApp\migrations\*
 !serverApp\migrations\__init__.py
 managerApp\migrations\*
