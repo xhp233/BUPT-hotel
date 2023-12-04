@@ -1,4 +1,4 @@
-class AirConditioner:
+class Scheduler:
     def __init__(self, target_temperature=22, billing_rate=1, temperature_change_rate=0.5, max_running=3):
         self.target_temperature = target_temperature
         self.billing_rate = billing_rate
@@ -14,7 +14,7 @@ class AirConditioner:
             'current_temperature': initial_temperature,
             'target_temperature': self.target_temperature,
             'running': True,#启动了空调调度程序
-            'fan_speed': 'medium',
+            'fan_speed': 'mid',
             'total_service_time': 0, #总服务时间
             'time_remaining':0,#服务队列里剩余时间
             'current_cost': 0,
@@ -23,7 +23,7 @@ class AirConditioner:
 
     def start_air_conditioning(self, room_number):
         self.rooms[room_number]['running']=True
-        self.rooms[room_number]['fan_speed']='medium'
+        self.rooms[room_number]['fan_speed']='mid'
         self.rooms[room_number]['target_temperature']=self.target_temperature
         self.running_rooms.append(room_number)
         self.waiting_queue.append(room_number)
@@ -50,7 +50,7 @@ class AirConditioner:
             fan_speed = self.rooms[room_number]['fan_speed']
             if fan_speed == 'high':
                 temperature_change_rate = 1.0
-            elif fan_speed == 'medium':
+            elif fan_speed == 'mid':
                 temperature_change_rate = 0.5
             elif fan_speed == 'low':
                 temperature_change_rate = 0.33
@@ -70,32 +70,11 @@ class AirConditioner:
 
 
     def calculate_cost(self, room_number, service_time):
-        fan_speed_mapping = {'high': 1, 'medium': 2, 'low': 3}
+        fan_speed_mapping = {'high': 1, 'mid': 2, 'low': 3}
         cost_rate = fan_speed_mapping[self.rooms[room_number]['fan_speed']]
         return service_time * cost_rate * self.billing_rate
 
-    def generate_detailed_invoice(self, room_number):
-        # Generate detailed invoice for a room
-        pass
 
-    def generate_summary_invoice(self):
-        # Generate summary invoice for all rooms
-        pass
-
-    
-    # def priority_scheduling(self):
-    #     # 先将已经达到目标温度的房间移出waiting_queue
-    #     remaining_rooms = [room for room in self.waiting_queue if self.rooms[room]['current_temperature'] < self.rooms[room]['target_temperature']]
-
-    #     # 对剩下的房间按照房间温度、风速大小和在等待队列的先后顺序排序
-    #     sorted_rooms = sorted(
-    #         remaining_rooms,
-    #         key=lambda x: (
-    #             self.rooms[x]['current_temperature'],
-    #             self.rooms[x]['fan_speed'],
-    #             self.waiting_queue.index(x)
-    #         )
-    #     )
     def priority_scheduling(self):
         # 按照房间风速大小和在等待队列的先后顺序排序
         remaining_rooms = [room for room in self.waiting_queue if self.rooms[room]['current_temperature'] < self.rooms[room]['target_temperature']]
@@ -130,10 +109,67 @@ class AirConditioner:
             print(f"Current Temperature: {self.rooms[room_number]['current_temperature']}°C")
             print("------")
 
+    def step(self):
+        # Step 1: 运行上一时刻服务队列里的房间，更新温度并减少服务时间
+        for room_number in self.service_queue:
+            if self.service_queue is not None:
+                self.update_temperature(room_number)
+                self.rooms[room_number]['time_remaining'] -= 1
+
+        # Step 2: 如果服务队列中房间不足3个，使用优先级调度算法将房间加入服务队列
+
+        if len(self.service_queue) < self.max_runningroom :#服务队列里小于三个房间
+            if len(self.running_rooms) > self.max_runningroom :#总运行房间大于三个房间
+                while len(self.service_queue) < self.max_runningroom:
+                    room_to_add = self.priority_scheduling()
+                    if room_to_add is not None:
+                        self.waiting_queue.remove(room_to_add)
+                        self.service_queue.append(room_to_add)
+                        self.rooms[room_to_add]['time_remaining'] = 2
+                        self.update_temperature(room_to_add)
+                        self.rooms[room_to_add]['time_remaining'] -= 1
+            else:#总运行房间小于等于三个房间
+                while len(self.service_queue) < len(self.running_rooms):
+                    room_to_add = self.priority_scheduling()
+                    if room_to_add is not None:
+                        self.waiting_queue.remove(room_to_add)
+                        self.service_queue.append(room_to_add)
+                        self.rooms[room_to_add]['time_remaining'] = 2
+                        self.update_temperature(room_to_add)
+                        self.rooms[room_to_add]['time_remaining'] -= 1
+                    if room_to_add is None:
+                        break
+                    
+        # Step 3: 处理房间更改请求，更新房间状态
+
+        for room_number in list(self.service_queue):
+            if (self.rooms[room_number][ 'target_temperature'] - self.rooms[room_number]['current_temperature'] <= 0.1 ):
+                # 房间到达目标温度 退出服务队列
+                self.rooms[room_number]['current_temperature'] = self.rooms[room_number][ 'target_temperature']
+                self.service_queue.remove(room_number)
+                self.waiting_queue.append(room_number)
+        for room_number in list(self.rooms):
+            # 如果房间关机，执行回温
+            if not self.rooms[room_number]['running']:
+                self.rooms[room_number]['current_temperature'] -= 0.5
+
+        # Step 4: 更新进入等待队列的房间
+        for room_number in list(self.service_queue):
+            if self.rooms[room_number]['time_remaining'] <= 0:
+                # 房间服务时间到，退出服务队列，进入等待队列
+                self.service_queue.remove(room_number)
+                self.waiting_queue.append(room_number)
+        # self.print_room_status() 
+        # print("waiting_queue:")
+        # for room_number in self.waiting_queue:
+        #     print(f"Room: {room_number}") 
+        # print("service_queue:")
+        # for room_number in self.service_queue:
+        #     print(f"Room: {room_number}") 
 
 if __name__ == '__main__':
     # 示例用法
-    ac_system = AirConditioner()
+    ac_system = Scheduler()
 
     # 添加房间
     ac_system.add_room('room_one', 10)
@@ -170,7 +206,7 @@ if __name__ == '__main__':
             ac_system.set_fan_speed('room_four', 'high')  # 房间四设置风速
             ac_system.set_target_temperature('room_four', 28)  # 房间四设置温度
         elif minute == 12:
-            ac_system.set_fan_speed('room_five', 'medium')  # 房间五设置风速
+            ac_system.set_fan_speed('room_five', 'mid')  # 房间五设置风速
         elif minute==13:
             ac_system.set_fan_speed('room_two', 'high')  # 房间四二设置风速
         elif minute == 15:
@@ -183,10 +219,10 @@ if __name__ == '__main__':
         elif minute == 19:
             ac_system.start_air_conditioning('room_one')  # 房间一开机
             ac_system.set_target_temperature('room_four', 25)  # 房间四设置温度
-            ac_system.set_fan_speed('room_four', 'medium')  # 房间四设置风速
+            ac_system.set_fan_speed('room_four', 'mid')  # 房间四设置风速
         elif minute == 21:
             ac_system.set_target_temperature('room_two', 27)  # 房间二设置温度
-            ac_system.set_fan_speed('room_two', 'medium')  # 房间二设置风速
+            ac_system.set_fan_speed('room_two', 'mid')  # 房间二设置风速
             ac_system.start_air_conditioning('room_five')  # 房间五开机
         elif minute == 25:
             ac_system.stop_air_conditioning('room_one')  # 房间一关机
@@ -196,69 +232,7 @@ if __name__ == '__main__':
             ac_system.stop_air_conditioning('room_two')  # 房间二关机
             ac_system.stop_air_conditioning('room_four')  # 房间四关机
 
-        # Step 1: 运行上一时刻服务队列里的房间，更新温度并减少服务时间
-        for room_number in ac_system.service_queue:
-            if ac_system.service_queue is not None:
-                ac_system.update_temperature(room_number)
-                ac_system.rooms[room_number]['time_remaining'] -= 1
-        print(f"\nTime 底: {minute}")
-        # print("waiting_queue:")
-        # for room_number in ac_system.waiting_queue:
-        #     print(f"Room: {room_number}") 
-        # print("service_queue:")
-        # for room_number in ac_system.service_queue:
-        #     print(f"Room: {room_number}") 
-        # Step 2: 如果服务队列中房间不足3个，使用优先级调度算法将房间加入服务队列
+        ac_system.step()
 
-        if len(ac_system.service_queue) < ac_system.max_runningroom :#服务队列里小于三个房间
-            if len(ac_system.running_rooms) > ac_system.max_runningroom :#总运行房间大于三个房间
-                while len(ac_system.service_queue) < ac_system.max_runningroom:
-                    room_to_add = ac_system.priority_scheduling()
-                    if room_to_add is not None:
-                        ac_system.waiting_queue.remove(room_to_add)
-                        ac_system.service_queue.append(room_to_add)
-                        ac_system.rooms[room_to_add]['time_remaining'] = 2
-                        ac_system.update_temperature(room_to_add)
-                        ac_system.rooms[room_to_add]['time_remaining'] -= 1
-            else:#总运行房间小于等于三个房间
-                while len(ac_system.service_queue) < len(ac_system.running_rooms):
-                    room_to_add = ac_system.priority_scheduling()
-                    if room_to_add is not None:
-                        ac_system.waiting_queue.remove(room_to_add)
-                        ac_system.service_queue.append(room_to_add)
-                        ac_system.rooms[room_to_add]['time_remaining'] = 2
-                        ac_system.update_temperature(room_to_add)
-                        ac_system.rooms[room_to_add]['time_remaining'] -= 1
-                    if room_to_add is None:
-                        break
-                    
-                        
-        # Step 3: 处理房间更改请求，更新房间状态
-
-        for room_number in list(ac_system.service_queue):
-            if (ac_system.rooms[room_number][ 'target_temperature'] -ac_system.rooms[room_number]['current_temperature']  <=0.1 ):
-                # 房间到达目标温度 退出服务队列
-                ac_system.rooms[room_number]['current_temperature']=ac_system.rooms[room_number][ 'target_temperature']
-                ac_system.service_queue.remove(room_number)
-                ac_system.waiting_queue.append(room_number)
-        for room_number in list(ac_system.rooms):
-            # 如果房间关机，执行回温
-            if not ac_system.rooms[room_number]['running']:
-                ac_system.rooms[room_number]['current_temperature'] -= 0.5
-
-        # Step 4: 更新进入等待队列的房间
-        for room_number in list(ac_system.service_queue):
-            if ac_system.rooms[room_number]['time_remaining'] <= 0:
-                # 房间服务时间到，退出服务队列，进入等待队列
-                ac_system.service_queue.remove(room_number)
-                ac_system.waiting_queue.append(room_number)
-        ac_system.print_room_status() 
-        print("waiting_queue:")
-        for room_number in ac_system.waiting_queue:
-            print(f"Room: {room_number}") 
-        print("service_queue:")
-        for room_number in ac_system.service_queue:
-            print(f"Room: {room_number}") 
-
-    print("final_temperature:")   
+    print("final_temperature:")
     ac_system.print_room_status() 

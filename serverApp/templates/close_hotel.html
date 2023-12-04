@@ -6,14 +6,18 @@
     <title>Open Hotel</title>
     <!-- Include Bootstrap CSS -->
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
 </head>
 <body>
     <div class="container">
-        <h1 class="mt-4 mb-4">CLOSE Hotel SUCCESS</h1>
+        <div class="d-flex justify-content-between align-items-center">
+            <h1>成功退房</h1>
+            <a class="btn btn-secondary" href="{% url 'logout' %}">登出</a>
+        </div>
         <p class="lead">{{roomNo}}号房间已闲置</p>
         <p class="lead">总计需要支付{{bill}}元</p>
         <a class="btn btn-secondary" href="{% url 'bill' %}?roomNo={{ roomNo }}">查看详单</a>
-        <a class="btn btn-primary" href="{% url 'receptionist' %}">Back</a>
+        <a class="btn btn-primary" href="{% url 'receptionist' %}">返回</a>
     </div>
 </body>
 </html>

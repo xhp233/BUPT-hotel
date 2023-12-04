@@ -34,15 +34,10 @@ def manager_get_data(request):
 @login_required
 def central_AC(request):
     if request.method == 'GET':
-        # param = request.GET.get('param')
         centralAC_info = CentralAC.objects.get()
-        context = {
-            'centralAC_info': centralAC_info,
-            'mode': centralAC_info.get_centralAC_mode_display(),
-            'status': centralAC_info.get_centralAC_status_display(),
-            # 'param': param
-        }
-        return render(request, 'central_AC.html', context)
+        centralAC_info.mode = centralAC_info.get_mode_display()
+        centralAC_info.status = centralAC_info.get_status_display()
+        return render(request, 'central_AC.html', {'centralAC_info': centralAC_info})
     else:
         return JsonResponse({'message': '请求方法错误'})
     
@@ -52,13 +47,15 @@ def open_central_AC(request):
         mode = request.POST.get('mode')
         max_temperature = request.POST.get('max_temperature')
         min_temperature = request.POST.get('min_temperature')
-        speed_fee = request.POST.get('speed_fee')
+        fee = request.POST.get('fee')
+        default_target_temperature = request.POST.get('default_target_temperature')
         centralAC_info = CentralAC.objects.get()
-        centralAC_info.centralAC_status = 'on'
-        centralAC_info.centralAC_mode = mode
+        centralAC_info.status = 'on'
+        centralAC_info.mode = mode
         centralAC_info.max_temperature = max_temperature
         centralAC_info.min_temperature = min_temperature
-        centralAC_info.speed_fee = speed_fee
+        centralAC_info.fee = fee
+        centralAC_info.default_target_temperature = default_target_temperature
         centralAC_info.save()
 
         return redirect('/manager/centralAC/')
@@ -69,9 +66,9 @@ def open_central_AC(request):
 def close_central_AC(request):
     if request.method == 'POST':
         central_AC = CentralAC.objects.get()
-        if central_AC.centralAC_status == 'off':
+        if central_AC.status == 'off':
             return JsonResponse({'message': '中央空调未开启'})
-        central_AC.centralAC_status = 'off'
+        central_AC.status = 'off'
         central_AC.save()
         acs = ACinfo.objects.all()
         for ac in acs:

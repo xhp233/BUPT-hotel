@@ -39,7 +39,7 @@ urlpatterns = [
     path('controls/<int:room_no>/', ACPanelApp_views.controls, name='controls'),
     path('power_on/<int:room_no>/', ACPanelApp_views.power_on, name='power_on'),
     path('power_off/<int:room_no>/', ACPanelApp_views.power_off, name='power_off'),
-    path('adjust_temperature/<int:room_no>/<int:target_temp>/', ACPanelApp_views.adjust_temperature, name='adjust_temperature'),
-    path('adjust_speed/<int:room_no>/<str:speed>/', ACPanelApp_views.adjust_speed, name='adjust_speed'),
-    path('temperature_control/<int:room_no>/', ACPanelApp_views.temperature_control, name='temperature_control'),
+    path('adjust_temperature/<int:room_no>/', ACPanelApp_views.adjust_temperature, name='adjust_temperature'),
+    path('adjust_speed/<int:room_no>/', ACPanelApp_views.adjust_speed, name='adjust_speed'),
+    # path('temperature_control/<int:room_no>/', ACPanelApp_views.temperature_control, name='temperature_control'),
 ]

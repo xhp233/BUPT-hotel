@@ -1,13 +1,12 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import login
 from django.shortcuts import render, redirect
 from django.contrib.auth.views import LoginView, LogoutView
 from django.http import JsonResponse
 from ACPanelApp.models import Room, ACinfo
 from serverApp.models import CustomUser, ACrecorddetail
 import random
+import time
 
 class MyLoginView(LoginView):
     template_name = 'login.html'
@@ -21,7 +20,9 @@ class MyLoginView(LoginView):
         elif self.request.user.role == 'receptionist':
             return redirect('receptionist')
         elif self.request.user.role == 'resident':
-            return redirect('Resident')
+            username = self.request.user.username
+            roomNo = username.lstrip('0')
+            return redirect('controls', room_no=roomNo)
         if self.request.user.is_superuser:
             return redirect('../admin/')
         return response
@@ -36,12 +37,12 @@ def hello(request):
 def receptionist_view(request):
     if request.method == 'GET':
         ##获取所有房间的数据
-        acs = Room.objects.all()
+        rooms = Room.objects.all()
         # 将status转换为中文
-        for ac in acs:
-            ac.room_status = ac.get_room_status_display()
+        for room in rooms:
+            room.room_status = room.get_room_status_display()
         ##返回给对应的html文件
-        return render(request, './receptionist.html', {'acs': acs})
+        return render(request, './receptionist.html', {'rooms': rooms})
     else:
         return JsonResponse({'message': '请求方法错误'})
 
@@ -70,6 +71,13 @@ def close_hotel(request):
             Room_info.room_status = 'empty'
             Room_info.save()
 
+            # 将空调关机
+            ac_info = ACinfo.objects.get(roomNo=roomNo)
+            ac_info.status = 'stopped'
+            ac_info.target_temperature = ''
+            ac_info.speed = ''
+            ac_info.save()
+
             #将账号和密码从数据库删除
             CustomUser.objects.filter(username=str(roomNo).zfill(4)).delete()
 
@@ -84,9 +92,12 @@ def close_hotel(request):
 def bill(request):
     if request.method == 'GET':
         roomNo = request.GET.get('roomNo')
-        if roomNo is not None:
-            bill_Info=ACrecorddetail.objects.get(roomNo=roomNo)
-            return render(request, './bill.html', {'bill_Info': bill_Info})
+        bill_Infos=ACrecorddetail.objects.all().filter(roomNo=roomNo)
+        for bill_Info in bill_Infos:
+            bill_Info.status = bill_Info.get_status_display()
+            bill_Info.speed = bill_Info.get_speed_display()
+            bill_Info.time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(bill_Info.time.timestamp()))
+        return render(request, './bill.html', {'bill_Infos': bill_Infos})
     else:
         return JsonResponse({'message': '请求方法错误'})
 
