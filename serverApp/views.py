@@ -67,16 +67,10 @@ def close_hotel(request):
     if request.method == 'GET':
         roomNo = request.GET.get('roomNo')
         if roomNo is not None:
+            # 将房间状态改为空闲
             Room_info = Room.objects.get(roomNo=roomNo)
             Room_info.room_status = 'empty'
             Room_info.save()
-
-            # 将空调关机
-            ac_info = ACinfo.objects.get(roomNo=roomNo)
-            ac_info.status = 'stopped'
-            ac_info.target_temperature = ''
-            ac_info.speed = ''
-            ac_info.save()
 
             #将账号和密码从数据库删除
             CustomUser.objects.filter(username=str(roomNo).zfill(4)).delete()
@@ -84,6 +78,13 @@ def close_hotel(request):
             #获取需要支付的金额
             acInfo=ACinfo.objects.get(roomNo=roomNo)
             bill=acInfo.fee
+
+            #将空调信息清空
+            acInfo.status='stopped'
+            acInfo.target_temperature=''
+            acInfo.speed=''
+            acInfo.fee=''
+            acInfo.save()
 
         return render(request, './close_hotel.html', {'roomNo': roomNo, 'bill': bill})
     else:
@@ -97,7 +98,10 @@ def bill(request):
             bill_Info.status = bill_Info.get_status_display()
             bill_Info.speed = bill_Info.get_speed_display()
             bill_Info.time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(bill_Info.time.timestamp()))
-        return render(request, './bill.html', {'bill_Infos': bill_Infos})
+        respose = render(request, './bill.html', {'bill_Infos': bill_Infos})
+        #删除数据库中的详单信息
+        bill_Infos.delete()
+        return respose
     else:
         return JsonResponse({'message': '请求方法错误'})
 

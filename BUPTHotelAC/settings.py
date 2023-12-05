@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'managerApp',
     'ACPanelApp',
     'serverApp',
+    # 'background_task',
 ]
 
 MIDDLEWARE = [

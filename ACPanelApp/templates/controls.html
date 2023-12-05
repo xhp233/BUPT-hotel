@@ -14,40 +14,36 @@
         <a class="btn btn-primary" href="{% url 'logout' %}">登出</a>
     </div>
     <div class="d-flex justify-content-between">
-        {% if status == '已停止' %}
             <!-- 打开空调的表单 -->
-            <form action="{% url 'power_on' room_no=room_no %}" method="post" class="mb-3">
+            <form id="power-on-form" action="{% url 'power_on' room_no=room_no %}" method="post" class="mb-3">
                 {% csrf_token %}
                 {% if centralACstatus == 'on' %}
                     <button type="submit" class="btn btn-success">开启空调</button>
                 {% else %}
                     <button type="submit" class="btn btn-success" disabled>开启空调</button>
-                    <p class="text-danger">中央空调已关闭，无法开启空调，请联系空调管理员</p>
+                    <p class="text-danger">中央空调已停止，无法开启空调，请联系空调管理员</p>
                 {% endif %}
             </form>
-        
-        {% else %}
             <!-- 关闭空调的表单 -->
-            <form action="{% url 'power_off' room_no=room_no %}" method="post" class="mb-3">
+            <form id="power-off-form" action="{% url 'power_off' room_no=room_no %}" method="post" class="mb-3">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger">关闭空调</button>
             </form>
-        {% endif %}
     </div>
-
-    <p class="mb-3">状态：{{ status }}</p>
-    <p class="mb-3">当前温度：{{ current_temperature }} °C</p>
-    {% if status == '运行中' %}
+    <div id="needrefresh">
+        <p class="mb-3">状态：{{ status }}</p>
+        <p class="mb-3">当前温度：{{ current_temperature }} °C</p>
         <p class="mb-3">目标温度：{{ target_temperature }} °C</p>
         <p class="mb-3">风速：{{ speed }}</p>
         <p class="mb-3">费用：{{ fee }} 元</p>
+    </div>
     <!-- 调整温度的表单 -->
     <form id="adjust-temperature-form" action="{% url 'adjust_temperature' room_no=room_no %}" method="post" class="mb-3">
         {% csrf_token %}
         <div class="form-group row">
             <label for="target_temp" class="col-sm-2 col-form-label">目标温度：</label>
             <div class="col-sm-8">
-                <input type="text" name="target_temp" id="target_temp" value="25" required class="form-control">
+                <input type="text" name="target_temp" id="target_temp" value="22" required class="form-control">
             </div>
             <div class="col-sm-2">
                 <button type="submit" class="btn btn-primary">调整温度</button>
@@ -56,7 +52,7 @@
     </form>
 
     <!-- 调整风速的表单 -->
-    <form action="{% url 'adjust_speed' room_no=room_no %}" method="post" class="mb-3">
+    <form id="adjust-speed-form" action="{% url 'adjust_speed' room_no=room_no %}" method="post" class="mb-3">
         {% csrf_token %}
         <div class="form-group row">
             <label for="speed" class="col-sm-2 col-form-label">风速：</label>
@@ -72,13 +68,46 @@
             </div>
         </div>
     </form>
-    {% endif %}
     <script>
+        $(document).ready(function(){
+            setInterval(function(){
+                $("#needrefresh").load(location.href + " #needrefresh");
+            }, 1000); // 每秒钟刷新一次
+        });
+        document.querySelector('#power-on-form').addEventListener('submit', function(event) {
+            var status = "{{ status }}";
+            console.log(status);
+            if (status !== "已停止") {
+                alert('空调已经开启，无法再次开启');
+                event.preventDefault();
+            }
+        });
+
+        document.querySelector('#power-off-form').addEventListener('submit', function(event) {
+            var status = "{{ status }}";
+            if (status !== "运行中") {
+                alert('空调已经关闭，无法再次关闭');
+                event.preventDefault();
+            }
+        });
+
+        document.querySelector('#adjust-speed-form').addEventListener('submit', function(event) {
+            var status = "{{ status }}";
+            if (status !== "运行中") {
+                alert('空调已经关闭，无法调整风速');
+                event.preventDefault();
+            }
+        });
         document.querySelector('#adjust-temperature-form').addEventListener('submit', function(event) {
             var target_temp = parseFloat(document.getElementById('target_temp').value);
             var max_temperature = parseFloat("{{ max_temperature }}");
             var min_temperature = parseFloat("{{ min_temperature }}");
+            var status = "{{ status }}";
 
+            if (status !== "运行中") {
+                alert('空调已经关闭，无法调整温度');
+                event.preventDefault();
+            }
             if (!isNumeric(target_temp)) {
                 alert('温度必须为数字');
                 event.preventDefault();

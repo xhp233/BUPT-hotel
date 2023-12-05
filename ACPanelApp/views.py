@@ -1,9 +1,12 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+# from background_task import background
+import time
 from .models import ACinfo, Room
 from managerApp.models import CentralAC
 from serverApp.models import ACrecorddetail
 from django.http import HttpResponse
+# from .scheduler import Scheduler
 from BUPTHotelAC.wsgi import scheduler
 
 @login_required # 限制未登录用户访问
@@ -25,26 +28,14 @@ def controls(request, room_no):
 
 # 开机
 def power_on(request, room_no):
-    if CentralAC.objects.get().status == 'on':
-        scheduler.start_air_conditioning(room_no)
-        # ac_info = ACinfo.objects.get(roomNo=room_no)
-        # ac_info.status = 'running'
-        # ac_info.target_temperature = '22'
-        # ac_info.speed = 'mid'
-        # ac_info.save()
-        # ACrecorddetail.objects.create(
-        #     roomNo=Room.objects.get(roomNo=room_no),
-        #     fee=0,
-        #     speed='mid',
-        #     target_temperature='22',
-        #     current_temperature=ac_info.current_temperature,
-        #     status='running'
-        #     )
+    if ACinfo.objects.get(roomNo=room_no).status == 'stopped':
+        if CentralAC.objects.get().status == 'on':
+            scheduler.start_air_conditioning(str(room_no))
     return redirect('controls', room_no=room_no)
 
 # 关机
 def power_off(request, room_no):
-    scheduler.stop_air_conditioning(room_no)
+    scheduler.stop_air_conditioning(str(room_no))
     # ac_info = ACinfo.objects.get(roomNo=room_no)
     # ac_info.status = 'stopped'
     # ac_info.target_temperature = ''
@@ -61,7 +52,7 @@ def power_off(request, room_no):
 
 # 调温
 def adjust_temperature(request, room_no):
-    scheduler.set_target_temperature(room_no, int(request.POST.get('target_temp')))
+    scheduler.set_target_temperature(str(room_no), int(request.POST.get('target_temp')))
     # ac_info = ACinfo.objects.get(roomNo=room_no)
     # target_temp = request.POST.get('target_temp')
     # if target_temp > CentralAC.objects.get().max_temperature or target_temp < CentralAC.objects.get().min_temperature:
@@ -79,7 +70,7 @@ def adjust_temperature(request, room_no):
 
 # 调风速
 def adjust_speed(request, room_no):
-    scheduler.set_fan_speed(room_no, request.POST.get('speed'))
+    scheduler.set_fan_speed(str(room_no), request.POST.get('speed'))
     # speed = request.POST.get('speed')
     # ac_info = ACinfo.objects.get(roomNo=room_no)
     # ac_info.speed = speed

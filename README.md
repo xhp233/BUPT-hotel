@@ -2,6 +2,8 @@
 
 先运行deleteDB.bat，然后再运行runserver.bat
 
+若失败，注释掉ACPanelApp\views.py第10行的from BUPTHotelAC.wsgi import scheduler，再运行runserver.bat，然后再取消注释，再运行runserver.bat
+
 # 默认账号密码
 
 管理员：admin admin
