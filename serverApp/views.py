@@ -46,6 +46,7 @@ def receptionist_view(request):
     else:
         return JsonResponse({'message': '请求方法错误'})
 
+@login_required
 def open_hotel(request):
     if request.method == 'GET':
         roomNo = request.GET.get('roomNo')
@@ -64,6 +65,7 @@ def open_hotel(request):
     else:
         return JsonResponse({'message': '请求方法错误'})
 
+@login_required
 def close_hotel(request):
     if request.method == 'GET':
         roomNo = request.GET.get('roomNo')
@@ -101,6 +103,7 @@ def close_hotel(request):
     else:
         return JsonResponse({'message': '请求方法错误'})
 
+@login_required
 def bill(request):
     if request.method == 'GET':
         roomNo = request.GET.get('roomNo')

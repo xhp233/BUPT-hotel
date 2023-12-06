@@ -30,13 +30,8 @@ def controls(request, room_no):
         }
     return render(request, 'controls.html', context)
 
-def set_request_time(room_no):
-    # 在详单的最后一项中设置请求时间
-    ac_record_detail = ACrecorddetail.objects.filter(roomNo=room_no).last()
-    ac_record_detail.request_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
-    ac_record_detail.save()
-
 # 开机
+@login_required
 def power_on(request, room_no):
     if ACinfo.objects.get(roomNo=room_no).status == 'stopped':
         if CentralAC.objects.get().status == 'on':
@@ -44,16 +39,19 @@ def power_on(request, room_no):
     return redirect('controls', room_no=room_no)
 
 # 关机
+@login_required
 def power_off(request, room_no):
     scheduler.stop_air_conditioning(str(room_no))
     return redirect('controls', room_no=room_no)
 
 # 调温
+@login_required
 def adjust_temperature(request, room_no):
     scheduler.set_target_temperature(str(room_no), int(request.POST.get('target_temp')))
     return redirect('controls', room_no=room_no)
 
 # 调风速
+@login_required
 def adjust_speed(request, room_no):
     scheduler.set_fan_speed(str(room_no), request.POST.get('speed'))
     return redirect('controls', room_no=room_no)
