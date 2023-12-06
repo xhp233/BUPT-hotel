@@ -7,6 +7,9 @@
     <!-- Include Bootstrap CSS -->
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
     <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    <script src="{% static 'js/html2canvas.min.js' %}"></script>
+    <script src="{% static 'js/jspdf.debug.js' %}"></script>
+    <script src="{% static 'js/xlsx.full.min.js' %}"></script>
 </head>
 <body>
     <div class="container">
@@ -14,10 +17,60 @@
             <h1>成功退房</h1>
             <a class="btn btn-secondary" href="{% url 'logout' %}">登出</a>
         </div>
-        <p class="lead">{{roomNo}}号房间已闲置</p>
-        <p class="lead">总计需要支付{{bill}}元</p>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">房间号</th>
+                    <th scope="col">开房时间</th>
+                    <th scope="col">退房时间</th>
+                    <th scope="col">费用</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{roomNo}}</td>
+                    <td>{{startTime}}</td>
+                    <td>{{endTime}}</td>
+                    <td>{{bill}}</td>
+                </tr>
+        </table>
+        <button id="btn-export-image">导出为PDF</button>
+        <button id="btn-export-excel">导出为Excel</button>
+        <br><br>
         <a class="btn btn-secondary" href="{% url 'bill' %}?roomNo={{ roomNo }}">查看详单</a>
         <a class="btn btn-primary" href="{% url 'receptionist' %}">返回</a>
     </div>
+    <script>
+        // 获取 URL 中的参数
+        var urlParams = new URLSearchParams(window.location.search);
+
+        // 获取房间号
+        var roomNo = urlParams.get('roomNo');
+
+        // 获取当前时间并格式化为字符串
+        var now = new Date();
+        var timestamp = now.getFullYear().toString() + (now.getMonth() + 1).toString().padStart(2, '0') + now.getDate().toString().padStart(2, '0') + '-' + now.getHours().toString().padStart(2, '0') + now.getMinutes().toString().padStart(2, '0') + now.getSeconds().toString().padStart(2, '0');
+
+        // 创建文件名
+        var filename = 'bill-room' + roomNo + '-' + timestamp;
+
+        // 导出为图片
+        document.getElementById('btn-export-image').addEventListener('click', function() {
+            html2canvas(document.querySelector('.table')).then(function(canvas) {
+                var imgData = canvas.toDataURL('image/png');
+                var doc = new jsPDF('p', 'mm', 'a4');  // 创建一个A4大小的PDF
+                var width = doc.internal.pageSize.getWidth();  // 获取PDF的宽度
+                var height = canvas.height * width / canvas.width;  // 计算图片的高度，保持图片的原始宽高比
+                doc.addImage(imgData, 'PNG', 0, 0, width, height);  // 将图片添加到PDF，图片的宽度为PDF的宽度，高度按照原始宽高比计算
+                doc.save(filename + '.pdf');
+            });
+        });
+
+        // 导出为Excel
+        document.getElementById('btn-export-excel').addEventListener('click', function() {
+            var wb = XLSX.utils.table_to_book(document.querySelector('.table'));
+            XLSX.writeFile(wb, filename + '.xlsx');
+        });
+    </script>
 </body>
 </html>

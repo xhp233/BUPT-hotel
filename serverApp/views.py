@@ -86,7 +86,17 @@ def close_hotel(request):
             acInfo.fee=''
             acInfo.save()
 
-        return render(request, './close_hotel.html', {'roomNo': roomNo, 'bill': bill})
+            room = Room.objects.get(roomNo=roomNo)
+
+            context = {
+                'roomNo': roomNo,
+                'bill': bill,
+                'startTime': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(room.open_time.timestamp())),
+                'endTime': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())),
+            }
+
+            return render(request, './close_hotel.html', context)
+        return JsonResponse({'message': '房间号为空'})
     else:
         return JsonResponse({'message': '请求方法错误'})
 
@@ -94,11 +104,22 @@ def bill(request):
     if request.method == 'GET':
         roomNo = request.GET.get('roomNo')
         bill_Infos=ACrecorddetail.objects.all().filter(roomNo=roomNo)
+        # 删除最后创建的一条记录
+        bill_Infos.last().delete()
+        total_fee = 0
+        # 将fee字段由累计费用改为每次消费
         for bill_Info in bill_Infos:
-            bill_Info.status = bill_Info.get_status_display()
+            bill_Info.fee = float(bill_Info.fee) - total_fee
+            total_fee += float(bill_Info.fee)
+            bill_Info.save()
+        # 删除fee为0的记录
+        bill_Infos = bill_Infos.exclude(fee=0.0)
+        for bill_Info in bill_Infos:
             bill_Info.speed = bill_Info.get_speed_display()
-            bill_Info.time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(bill_Info.time.timestamp()))
-        respose = render(request, './bill.html', {'bill_Infos': bill_Infos})
+            bill_Info.start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(bill_Info.start_time.timestamp()))
+            bill_Info.end_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(bill_Info.end_time.timestamp()))
+            bill_Info.request_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(bill_Info.request_time.timestamp()))
+        respose = render(request, './bill.html', {'bill_Infos': bill_Infos, 'total_fee': total_fee})
         #删除数据库中的详单信息
         bill_Infos.delete()
         return respose

@@ -9,30 +9,46 @@ https://docs.djangoproject.com/en/4.1/howto/deployment/wsgi/
 import threading
 import time
 import os
+import winsound
 
+from django.utils import timezone
 from django.core.wsgi import get_wsgi_application
 from managerApp.models import CentralAC
 from ACPanelApp.models import ACinfo, Room
 from serverApp.models import CustomUser, ACrecorddetail
-from .scheduler import Scheduler
+from .scheduler import scheduler
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'BUPTHotelAC.settings')
 
 application = get_wsgi_application()
+
+use_test_case = False
+num_of_rooms = 5
+wait = 10
 
 def create_central_AC():
     try:
         CentralAC.objects.all().delete()
     finally:
         # 创建一个CentralAC对象
-        CentralAC.objects.create(
-            mode='heat',
-            status='on',
-            max_temperature='30',
-            min_temperature='16',
-            fee='1',
-            default_target_temperature='22'
-        )
+        if use_test_case:
+            CentralAC.objects.create(
+                mode='heat',
+                status='on',
+                max_temperature='30',
+                min_temperature='16',
+                fee='1',
+                default_target_temperature='22'
+            )
+        else:
+            CentralAC.objects.create(
+                mode='',
+                status='off',
+                max_temperature='',
+                min_temperature='',
+                fee='',
+                default_target_temperature=''
+            )
         print('create central AC success')
 
 def create_admin(username='admin', password='admin'):
@@ -102,48 +118,15 @@ def delete_all_user():
     finally:
         print('delete all user success')
 
-use_test_case = False
-num_of_rooms = 5
-create_central_AC()
-delete_all_user()
-create_admin('admin', 'admin')
-create_ACadmin('ACadmin', 'ACadmin')
-create_receptionist('receptionist', 'receptionist')
-# create_room(num_of_rooms)
-# init_AC_info(num_of_rooms)
-try:
-    ACinfo.objects.all().delete()
-    Room.objects.all().delete()
-finally:
-    room = Room.objects.create(roomNo='1', room_status='occupied' if use_test_case else 'empty')
-    ACinfo.objects.create(roomNo=room, status='stopped', current_temperature='10', fee='0')
-    room = Room.objects.create(roomNo='2', room_status='occupied' if use_test_case else 'empty')
-    ACinfo.objects.create(roomNo=room, status='stopped', current_temperature='15', fee='0')
-    room = Room.objects.create(roomNo='3', room_status='occupied' if use_test_case else 'empty')
-    ACinfo.objects.create(roomNo=room, status='stopped', current_temperature='18', fee='0')
-    room = Room.objects.create(roomNo='4', room_status='occupied' if use_test_case else 'empty')
-    ACinfo.objects.create(roomNo=room, status='stopped', current_temperature='12', fee='0')
-    room = Room.objects.create(roomNo='5', room_status='occupied' if use_test_case else 'empty')
-    ACinfo.objects.create(roomNo=room, status='stopped', current_temperature='14', fee='0')
-    print('create AC info success')
-create_ACrecorddetail(num_of_rooms)
-
-print("\nServer activate success\n")
-
-scheduler = Scheduler()
-scheduler.add_room('1', 10)
-scheduler.add_room('2', 15)
-scheduler.add_room('3', 18)
-scheduler.add_room('4', 12)
-scheduler.add_room('5', 14)
-
 def run_scheduler(wait):
     count = 0
     while True:
         count += 1
-        time.sleep(wait)
+        winsound.Beep(1000, 1000)
+        time.sleep(wait)        
         scheduler.step()
         acs = ACinfo.objects.all()
+        centralAC = CentralAC.objects.get()
         for roomNo in scheduler.rooms.keys():
             room = Room.objects.get(roomNo=roomNo)
             if room.room_status == 'occupied':
@@ -155,30 +138,37 @@ def run_scheduler(wait):
                     status = 'stopped'
                 current_temperature = scheduler.rooms[roomNo]['current_temperature']
                 target_temperature = scheduler.rooms[roomNo]['target_temperature']
-                fee = scheduler.rooms[roomNo]['current_cost']
+                total_fee = scheduler.rooms[roomNo]['current_cost']
                 speed = scheduler.rooms[roomNo]['fan_speed']
+                request_time = scheduler.rooms[roomNo]['request_time']
                 ac = acs.get(roomNo=roomNo)
+                # 去除scheduler.request_queue中的重复元素
+                scheduler.request_queue = list(set(scheduler.request_queue))
+                if roomNo in scheduler.request_queue:
+                    # 将开始时间最晚的详单记录的结束时间设为当前时间，并填上当前数据
+                    ac_records = ACrecorddetail.objects.filter(roomNo=room).order_by('-start_time')
+                    if ac_records.exists():
+                        ac_record = ac_records[0]
+                        ac_record.current_temperature = ac.current_temperature
+                        ac_record.target_temperature = ac.target_temperature
+                        ac_record.fee_rate = centralAC.fee
+                        ac_record.fee = ac.fee
+                        ac_record.speed = ac.speed
+                        ac_record.end_time = timezone.now()
+                        ac_record.save()
+                    # 创建新的空白详单记录
+                    new_record = ACrecorddetail.objects.create(roomNo=Room.objects.get(roomNo=roomNo))
+                    new_record.request_time = request_time
+                    new_record.save()
                 ac.status = status
-                ac.current_temperature = current_temperature
-                ac.target_temperature = target_temperature
-                ac.fee = fee
+                ac.current_temperature = round(current_temperature, 2)
+                ac.target_temperature = int(target_temperature)
+                ac.fee = round(total_fee, 2)
                 ac.speed = speed
                 ac.save()
-                ACrecorddetail.objects.create(
-                    roomNo=Room.objects.get(roomNo=roomNo),
-                    fee=fee,
-                    speed=speed,
-                    target_temperature=target_temperature,
-                    current_temperature=current_temperature,
-                    status=status
-                    )
 
         print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+' scheduler step ' + str(count))
-
-wait = 10
-# 创建新线程来运行调度器
-scheduler_thread = threading.Thread(target=run_scheduler, args=(wait,))
-scheduler_thread.start()
+        scheduler.request_queue = []
 
 def room1(wait):
     time.sleep(3)
@@ -265,5 +255,44 @@ def test_case():
     room4_thread.start()
     room5_thread.start()
 
-if use_test_case:
-    test_case()
+try:
+    create_central_AC()
+    delete_all_user()
+    create_admin('admin', 'admin')
+    create_ACadmin('ACadmin', 'ACadmin')
+    create_receptionist('receptionist', 'receptionist')
+    # create_room(num_of_rooms)
+    # init_AC_info(num_of_rooms)
+    try:
+        ACinfo.objects.all().delete()
+        Room.objects.all().delete()
+    finally:
+        room = Room.objects.create(roomNo='1', room_status='occupied' if use_test_case else 'empty')
+        ACinfo.objects.create(roomNo=room, status='stopped', current_temperature='10', fee='0')
+        room = Room.objects.create(roomNo='2', room_status='occupied' if use_test_case else 'empty')
+        ACinfo.objects.create(roomNo=room, status='stopped', current_temperature='15', fee='0')
+        room = Room.objects.create(roomNo='3', room_status='occupied' if use_test_case else 'empty')
+        ACinfo.objects.create(roomNo=room, status='stopped', current_temperature='18', fee='0')
+        room = Room.objects.create(roomNo='4', room_status='occupied' if use_test_case else 'empty')
+        ACinfo.objects.create(roomNo=room, status='stopped', current_temperature='12', fee='0')
+        room = Room.objects.create(roomNo='5', room_status='occupied' if use_test_case else 'empty')
+        ACinfo.objects.create(roomNo=room, status='stopped', current_temperature='14', fee='0')
+        print('create AC info success')
+    create_ACrecorddetail(num_of_rooms)
+
+    print("\nServer activate success\n")
+
+    scheduler.add_room('1', 10)
+    scheduler.add_room('2', 15)
+    scheduler.add_room('3', 18)
+    scheduler.add_room('4', 12)
+    scheduler.add_room('5', 14)
+
+    # 创建新线程来运行调度器
+    scheduler_thread = threading.Thread(target=run_scheduler, args=(wait,))
+    scheduler_thread.start()
+
+    if use_test_case:
+        test_case()
+except:
+    print("\nServer activate failed\n")

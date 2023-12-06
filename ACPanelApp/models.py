@@ -10,6 +10,7 @@ class Room(models.Model):
 
     roomNo = models.CharField(max_length=50,primary_key=True)
     room_status = models.CharField(max_length=50,default='',choices=STATUS_CHOICES)# empty, occupied
+    open_time = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'room'

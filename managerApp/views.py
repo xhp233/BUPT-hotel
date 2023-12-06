@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from managerApp.models import CentralAC
 from ACPanelApp.models import ACinfo
 from django.shortcuts import render, redirect
-from BUPTHotelAC.wsgi import scheduler
+from BUPTHotelAC.scheduler import scheduler
 
 @login_required
 def manager(request):
@@ -58,7 +58,7 @@ def open_central_AC(request):
         centralAC_info.fee = fee
         centralAC_info.default_target_temperature = default_target_temperature
         centralAC_info.save()
-        scheduler.set_params(default_target_temperature, fee, 1.0, 1 if mode == 'heat' else 0)
+        scheduler.set_params(default_target_temperature, fee, 1.0, 1 if mode == 'heat' else -1)
         return redirect('/manager/centralAC/')
     else:
         return JsonResponse({'message': '请求方法错误'})

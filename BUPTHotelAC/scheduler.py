@@ -1,3 +1,4 @@
+from django.utils import timezone
 class Scheduler:
     def __init__(self, target_temperature=22.0, billing_rate=1.0, temperature_change_rate=0.5, max_running=3):
         self.coolheat = 1
@@ -9,9 +10,12 @@ class Scheduler:
         self.running_rooms = []  # 记录当前正在运行的房间
         self.service_queue = []  # 记录服务队列，服务时长最长的房间
         self.waiting_queue = []  # 记录等待队列
+        self.request_queue = []  # 记录请求队列
 
     def set_params(self, target_temperature, billing_rate, temperature_change_rate, coolheat):
         self.target_temperature = float(target_temperature)
+        for room_number in self.rooms:
+            self.rooms[room_number]['target_temperature'] = self.target_temperature
         self.billing_rate = float(billing_rate)
         self.temperature_change_rate = float(temperature_change_rate)
         self.coolheat = float(coolheat)
@@ -25,11 +29,15 @@ class Scheduler:
             'total_service_time': 0, #总服务时间
             'time_remaining':0,#服务队列里剩余时间
             'current_cost': 0,
-            # 'history': []
+            'request_time': timezone.now(),#请求时间
+            # 'history': [],
         }
 
     def start_air_conditioning(self, room_number):
         print("room " + room_number + " start_air_conditioning")
+        self.rooms[room_number]['step_cost'] = []
+        self.request_queue.append(room_number)
+        self.rooms[room_number]['request_time'] = timezone.now()
         self.rooms[room_number]['running']=True
         self.rooms[room_number]['fan_speed']='mid'
         self.rooms[room_number]['target_temperature']=self.target_temperature
@@ -38,14 +46,23 @@ class Scheduler:
 
     def set_target_temperature(self, room_number, target_temperature):
         print("room " + room_number + " set_target_temperature " + str(target_temperature))
+        self.rooms[room_number]['step_cost'] = []
+        self.request_queue.append(room_number)
+        self.rooms[room_number]['request_time'] = timezone.now()
         self.rooms[room_number]['target_temperature'] = float(target_temperature)
 
     def set_fan_speed(self, room_number, fan_speed):
         print("room " + room_number + " set_fan_speed " + fan_speed)
+        self.rooms[room_number]['step_cost'] = []
+        self.request_queue.append(room_number)
+        self.rooms[room_number]['request_time'] = timezone.now()
         self.rooms[room_number]['fan_speed'] = fan_speed
 
     def stop_air_conditioning(self, room_number):
         print("room " + room_number + " stop_air_conditioning")
+        self.rooms[room_number]['step_cost'] = []
+        self.request_queue.append(room_number)
+        self.rooms[room_number]['request_time'] = timezone.now()
         if room_number in self.running_rooms:
             self.running_rooms.remove(room_number)
         if room_number in self.service_queue:
@@ -73,14 +90,6 @@ class Scheduler:
             self.rooms[room_number]['current_temperature'] += temperature_change_rate * self.coolheat
             self.rooms[room_number]['current_cost'] += self.billing_rate * temperature_change_rate
 
-            # # Record history data
-            # self.rooms[room_number]['history'].append({
-            #     'timestamp': self.rooms[room_number]['time_remaining'],
-            #     'current_temperature': self.rooms[room_number]['current_temperature'],
-            #     'fan_speed': fan_speed
-            # })
-
-
     def priority_scheduling(self):
         # 按照房间风速大小和在等待队列的先后顺序排序
         remaining_rooms = [room for room in self.waiting_queue if float(self.rooms[room]['current_temperature']) < float(self.rooms[room]['target_temperature'])]
@@ -95,25 +104,6 @@ class Scheduler:
             return sorted_rooms[0]
 
         return None
-
-
-    # def print_room_status(self):
-    #     for room_number in self.rooms:
-    #         # 输出房间信息
-    #         print(f"Room: {room_number}")
-    #         if room_number in self.running_rooms:
-    #             # 如果房间在运行中，输出目标温度
-    #             print(f"Running: {self.rooms[room_number]['running']}")
-    #             print(f"Target Temperature: {self.rooms[room_number]['target_temperature']}°C")
-    #             if room_number in self.service_queue:
-    #                 # 如果房间在服务队列，输出剩余时间和当前温度                    
-    #                 print(f"Time Remaining: {self.rooms[room_number]['time_remaining']} minutes")
-                    
-
-    #         # 其他情况输出总服务时间和当前温度
-    #         #print(f"Total Service Time: {self.rooms[room_number]['total_service_time']} minutes")
-    #         print(f"Current Temperature: {self.rooms[room_number]['current_temperature']}°C")
-    #         print("------")
 
     def step(self):
         # Step 1: 运行上一时刻服务队列里的房间，更新温度并减少服务时间
@@ -165,13 +155,8 @@ class Scheduler:
                 # 房间服务时间到，退出服务队列，进入等待队列
                 self.service_queue.remove(room_number)
                 self.waiting_queue.append(room_number)
-        # self.print_room_status() 
-        # print("waiting_queue:")
-        # for room_number in self.waiting_queue:
-        #     print(f"Room: {room_number}") 
-        # print("service_queue:")
-        # for room_number in self.service_queue:
-        #     print(f"Room: {room_number}") 
+
+scheduler = Scheduler()
 
 if __name__ == '__main__':
     # 示例用法

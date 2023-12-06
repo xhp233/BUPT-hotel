@@ -19,32 +19,42 @@
         <thead>
             <tr>
                 <th scope="col">房间号</th>
-                <th scope="col">状态</th>
                 <th scope="col">房间温度</th>
                 <th scope="col">目标温度</th>
                 <th scope="col">风速</th>
-                <th scope="col">时间</th>
+                <th scope="col">请求时间</th>
+                <th scope="col">开始时间</th>
+                <th scope="col">结束时间</th>
                 <th scope="col">费用</th>
+                <th scope="col">费率</th>
             </tr>
         </thead>
         <tbody>
             {% for bill_Info in bill_Infos %}
             <tr>
                 <td>{{ bill_Info.roomNo.roomNo }}</td>
-                <td>{{ bill_Info.status }}</td>
                 <td>{{ bill_Info.current_temperature }}</td>
                 <td>{{ bill_Info.target_temperature }}</td>
                 <td>{{ bill_Info.speed }}</td>
-                <td>{{ bill_Info.time }}</td>
+                <td>{{ bill_Info.request_time }}</td>
+                <td>{{ bill_Info.start_time }}</td>
+                <td>{{ bill_Info.end_time }}</td>
                 <td>{{ bill_Info.fee }}</td>
+                <td>{{ bill_Info.fee_rate }} 元/度</td>
             </tr>
+            {% if forloop.last %}
+            <tr>
+                <td colspan="7">总费用</td>
+                <td>{{ total_fee }} 元</td>
+            </tr>
+            {% endif %}
             {% endfor %}
         </tbody>
     </table>
     <button id="btn-export-image">导出为PDF</button>
     <button id="btn-export-excel">导出为Excel</button>
     <br><br>
-    <a class="btn btn-primary" href="{% url 'receptionist' %}">Back</a>
+    <a class="btn btn-primary" href="{% url 'receptionist' %}">返回</a>
 
     <script>
         // 获取 URL 中的参数
@@ -58,7 +68,7 @@
         var timestamp = now.getFullYear().toString() + (now.getMonth() + 1).toString().padStart(2, '0') + now.getDate().toString().padStart(2, '0') + '-' + now.getHours().toString().padStart(2, '0') + now.getMinutes().toString().padStart(2, '0') + now.getSeconds().toString().padStart(2, '0');
 
         // 创建文件名
-        var filename = 'room' + roomNo + '-' + timestamp;
+        var filename = 'detail-bill-room' + roomNo + '-' + timestamp;
 
         // 导出为图片
         document.getElementById('btn-export-image').addEventListener('click', function() {
