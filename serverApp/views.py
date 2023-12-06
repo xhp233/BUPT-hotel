@@ -59,6 +59,7 @@ def open_hotel(request):
             user=CustomUser.objects.create(username=str(accout_num).zfill(4),role='resident')
             user.set_password(str(password))
             user.save()
+            ACrecorddetail.objects.create(roomNo=Room_info)
         return render(request, './open_hotel.html', {'roomNo': str(accout_num).zfill(4), 'password': password})
     else:
         return JsonResponse({'message': '请求方法错误'})
