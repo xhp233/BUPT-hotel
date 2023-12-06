@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
 from managerApp.models import CentralAC
 from ACPanelApp.models import ACinfo
@@ -7,12 +7,16 @@ from BUPTHotelAC.scheduler import scheduler
 
 @login_required
 def manager(request):
+    if request.user.role != 'manager':
+        return HttpResponse('您没有权限访问该页面')
     if request.method == 'GET':
         if request.user.role == 'acmanager':
             return render(request, 'manager.html')
 
 @login_required
 def manager_get_data(request):
+    if request.user.role != 'manager':
+        return HttpResponse('您没有权限访问该页面')
     if request.method == 'GET':
         data = ACinfo.objects.all()
         data = list(data.values())
@@ -34,6 +38,8 @@ def manager_get_data(request):
 
 @login_required
 def central_AC(request):
+    if request.user.role != 'manager':
+        return HttpResponse('您没有权限访问该页面')
     if request.method == 'GET':
         centralAC_info = CentralAC.objects.get()
         centralAC_info.mode = centralAC_info.get_mode_display()
@@ -44,6 +50,8 @@ def central_AC(request):
     
 @login_required
 def open_central_AC(request):
+    if request.user.role != 'manager':
+        return HttpResponse('您没有权限访问该页面')
     if request.method == 'POST':
         mode = request.POST.get('mode')
         max_temperature = request.POST.get('max_temperature')
@@ -65,6 +73,8 @@ def open_central_AC(request):
 
 @login_required
 def close_central_AC(request):
+    if request.user.role != 'manager':
+        return HttpResponse('您没有权限访问该页面')
     if request.method == 'POST':
         central_AC = CentralAC.objects.get()
         if central_AC.status == 'off':

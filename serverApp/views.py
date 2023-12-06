@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth.views import LoginView, LogoutView
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from ACPanelApp.models import Room, ACinfo
 from serverApp.models import CustomUser, ACrecorddetail
 import random
@@ -35,6 +35,8 @@ def hello(request):
 
 @login_required # 限制未登录用户访问
 def receptionist_view(request):
+    if request.user.role != 'receptionist':
+        return HttpResponse('您没有权限访问该页面')
     if request.method == 'GET':
         ##获取所有房间的数据
         rooms = Room.objects.all()
@@ -48,6 +50,8 @@ def receptionist_view(request):
 
 @login_required
 def open_hotel(request):
+    if request.user.role != 'receptionist':
+        return HttpResponse('您没有权限访问该页面')
     if request.method == 'GET':
         roomNo = request.GET.get('roomNo')
         if roomNo is not None:
@@ -57,7 +61,7 @@ def open_hotel(request):
             password = random.randint(1000, 9999)
             accout_num=roomNo
             #将账号和密码加入数据库
-            user=CustomUser.objects.create(username=str(accout_num).zfill(4),role='resident')
+            user=CustomUser.objects.create(username=str(accout_num).zfill(4),role='resident',roomNo=Room_info)
             user.set_password(str(password))
             user.save()
             ACrecorddetail.objects.create(roomNo=Room_info)
@@ -67,6 +71,8 @@ def open_hotel(request):
 
 @login_required
 def close_hotel(request):
+    if request.user.role != 'receptionist':
+        return HttpResponse('您没有权限访问该页面')
     if request.method == 'GET':
         roomNo = request.GET.get('roomNo')
         if roomNo is not None:
@@ -105,6 +111,8 @@ def close_hotel(request):
 
 @login_required
 def bill(request):
+    if request.user.role != 'receptionist':
+        return HttpResponse('您没有权限访问该页面')
     if request.method == 'GET':
         roomNo = request.GET.get('roomNo')
         bill_Infos=ACrecorddetail.objects.all().filter(roomNo=roomNo)

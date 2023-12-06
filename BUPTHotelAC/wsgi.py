@@ -46,8 +46,8 @@ def create_central_AC():
                 status='off',
                 max_temperature='',
                 min_temperature='',
-                fee='',
-                default_target_temperature=''
+                fee='1',
+                default_target_temperature='22'
             )
         print('create central AC success')
 
