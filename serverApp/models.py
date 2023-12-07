@@ -5,7 +5,7 @@ from django.db import models
 
 
 class CustomUser(AbstractUser):
-    role = models.CharField(max_length=20)
+    role = models.CharField(max_length=20) # resident, acmanager, receptionist, manager
     roomNo = models.ForeignKey(Room, on_delete=models.CASCADE, null=True)
 
     class Meta:

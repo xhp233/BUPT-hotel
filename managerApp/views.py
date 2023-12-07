@@ -7,7 +7,7 @@ from BUPTHotelAC.scheduler import scheduler
 
 @login_required
 def manager(request):
-    if request.user.role != 'manager':
+    if request.user.role != 'acmanager':
         return HttpResponse('您没有权限访问该页面')
     if request.method == 'GET':
         if request.user.role == 'acmanager':
@@ -15,7 +15,7 @@ def manager(request):
 
 @login_required
 def manager_get_data(request):
-    if request.user.role != 'manager':
+    if request.user.role != 'acmanager':
         return HttpResponse('您没有权限访问该页面')
     if request.method == 'GET':
         data = ACinfo.objects.all()
@@ -38,7 +38,7 @@ def manager_get_data(request):
 
 @login_required
 def central_AC(request):
-    if request.user.role != 'manager':
+    if request.user.role != 'acmanager':
         return HttpResponse('您没有权限访问该页面')
     if request.method == 'GET':
         centralAC_info = CentralAC.objects.get()
@@ -50,7 +50,7 @@ def central_AC(request):
     
 @login_required
 def open_central_AC(request):
-    if request.user.role != 'manager':
+    if request.user.role != 'acmanager':
         return HttpResponse('您没有权限访问该页面')
     if request.method == 'POST':
         mode = request.POST.get('mode')
@@ -73,7 +73,7 @@ def open_central_AC(request):
 
 @login_required
 def close_central_AC(request):
-    if request.user.role != 'manager':
+    if request.user.role != 'acmanager':
         return HttpResponse('您没有权限访问该页面')
     if request.method == 'POST':
         central_AC = CentralAC.objects.get()
