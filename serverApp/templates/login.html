@@ -9,18 +9,18 @@
     <div class="container d-flex flex-column justify-content-center align-items-center" style="height: 100vh;">
         {% if form.errors %}
         <div class="alert alert-danger" role="alert">
-            Your username and password didn't match. Please try again.
+            用户名或密码错误，请重试。
         </div>
         {% endif %}
 
         {% if next %}
             {% if user.is_authenticated %}
             <div class="alert alert-warning" role="alert">
-                Your account doesn't have access to this page. To proceed, please login with an account that has access.
+                你无权访问该页面。
             </div>
             {% else %}
             <div class="alert alert-info" role="alert">
-                Please login to see this page.
+                请先登录。
             </div>
             {% endif %}
         {% endif %}

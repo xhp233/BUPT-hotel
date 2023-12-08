@@ -9,7 +9,7 @@ class Room(models.Model):
     )
 
     roomNo = models.CharField(max_length=50,primary_key=True)
-    room_status = models.CharField(max_length=50,default='',choices=STATUS_CHOICES)# empty, occupied
+    room_status = models.CharField(max_length=50,default='',choices=STATUS_CHOICES)
     open_time = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -29,10 +29,10 @@ class ACinfo(models.Model):
     )
 
     roomNo = models.OneToOneField(Room, on_delete=models.CASCADE, primary_key=True)
-    status = models.CharField(max_length=50,default='',choices=STATUS_CHOICES)# running, stopped, waiting
+    status = models.CharField(max_length=50,default='',choices=STATUS_CHOICES)
     current_temperature = models.CharField(max_length=50,default='')
     target_temperature = models.CharField(max_length=50,default='')
-    speed = models.CharField(max_length=50,default='',choices=SPEED_CHOICES)# low, mid, high
+    speed = models.CharField(max_length=50,default='',choices=SPEED_CHOICES)
     fee = models.CharField(max_length=50,default='')
 
     class Meta:

@@ -11,6 +11,7 @@ import time
 class MyLoginView(LoginView):
     template_name = 'login.html'
 
+    # 重写form_valid方法，根据用户角色跳转到不同的页面
     def form_valid(self, form):
         response = super().form_valid(form)
         if self.request.user.role == 'acmanager':
@@ -30,26 +31,38 @@ class MyLoginView(LoginView):
 class MyLogoutView(LogoutView):
     next_page = 'login'
 
+# 欢迎页面
 def hello(request):
     return render(request, './hello.html')
 
 @login_required # 限制未登录用户访问
 def receptionist_view(request):
+    '''
+    该函数用于处理前台界面的请求
+    :param request: 请求
+    :return: 渲染后的前台界面
+    '''
+    # 限制非前台人员访问
     if request.user.role != 'receptionist':
         return HttpResponse('您没有权限访问该页面')
     if request.method == 'GET':
-        ##获取所有房间的数据
+        # 获取所有房间的数据
         rooms = Room.objects.all()
         # 将status转换为中文
         for room in rooms:
             room.room_status = room.get_room_status_display()
-        ##返回给对应的html文件
+        # 返回给对应的html文件
         return render(request, './receptionist.html', {'rooms': rooms})
     else:
         return JsonResponse({'message': '请求方法错误'})
 
 @login_required
 def open_hotel(request):
+    '''
+    该函数用于处理开房请求
+    :param request: 请求
+    :return: 渲染后的开房界面
+    '''
     if request.user.role != 'receptionist':
         return HttpResponse('您没有权限访问该页面')
     if request.method == 'GET':
@@ -58,12 +71,14 @@ def open_hotel(request):
             Room_info = Room.objects.get(roomNo=roomNo)
             Room_info.room_status = 'occupied'
             Room_info.save()
+            # 生成账号和密码
             password = random.randint(1000, 9999)
             accout_num=roomNo
-            #将账号和密码加入数据库
+            # 将账号和密码加入数据库
             user=CustomUser.objects.create(username=str(accout_num).zfill(4),role='resident',roomNo=Room_info)
             user.set_password(str(password))
             user.save()
+            # 生成空的详单记录
             ACrecorddetail.objects.create(roomNo=Room_info)
         return render(request, './open_hotel.html', {'roomNo': str(accout_num).zfill(4), 'password': password})
     else:
@@ -71,6 +86,11 @@ def open_hotel(request):
 
 @login_required
 def close_hotel(request):
+    '''
+    该函数用于处理退房请求
+    :param request: 请求
+    :return: 渲染后的退房界面
+    '''
     if request.user.role != 'receptionist':
         return HttpResponse('您没有权限访问该页面')
     if request.method == 'GET':
@@ -111,12 +131,17 @@ def close_hotel(request):
 
 @login_required
 def bill(request):
+    '''
+    该函数用于处理账单请求
+    :param request: 请求
+    :return: 渲染后的账单界面
+    '''
     if request.user.role != 'receptionist':
         return HttpResponse('您没有权限访问该页面')
     if request.method == 'GET':
         roomNo = request.GET.get('roomNo')
         bill_Infos=ACrecorddetail.objects.all().filter(roomNo=roomNo)
-        # 删除最后创建的一条记录
+        # 删除最后创建的一条记录（因为最后一条记录是空的）
         bill_Infos.last().delete()
         total_fee = 0
         # 将fee字段由累计费用改为每次消费

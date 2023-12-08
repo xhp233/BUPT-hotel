@@ -21,6 +21,7 @@ def controls(request, room_no):
             return HttpResponse('您没有权限访问该页面')
     except:
         pass
+    # 获取该房间空调与中央空调的信息
     ac_info = ACinfo.objects.get(roomNo=room_no)
     centralAC = CentralAC.objects.get()
     context = {
@@ -40,6 +41,12 @@ def controls(request, room_no):
 # 开机
 @login_required
 def power_on(request, room_no):
+    '''
+    该函数用于处理开机请求
+    :param request: 请求
+    :param room_no: 房间号
+    :return: 重定向到控制界面
+    '''
     if request.user.role != 'resident':
         return HttpResponse('您没有权限访问该页面')
     try:
@@ -56,6 +63,12 @@ def power_on(request, room_no):
 # 关机
 @login_required
 def power_off(request, room_no):
+    '''
+    该函数用于处理关机请求
+    :param request: 请求
+    :param room_no: 房间号
+    :return: 重定向到控制界面
+    '''
     if request.user.role != 'resident':
         return HttpResponse('您没有权限访问该页面')
     try:
@@ -70,6 +83,12 @@ def power_off(request, room_no):
 # 调温
 @login_required
 def adjust_temperature(request, room_no):
+    '''
+    该函数用于处理调温请求
+    :param request: 请求
+    :param room_no: 房间号
+    :return: 重定向到控制界面
+    '''
     if request.user.role != 'resident':
         return HttpResponse('您没有权限访问该页面')
     try:
@@ -84,6 +103,12 @@ def adjust_temperature(request, room_no):
 # 调风速
 @login_required
 def adjust_speed(request, room_no):
+    '''
+    该函数用于处理调风速请求
+    :param request: 请求
+    :param room_no: 房间号
+    :return: 重定向到控制界面
+    '''
     if request.user.role != 'resident':
         return HttpResponse('您没有权限访问该页面')
     try:

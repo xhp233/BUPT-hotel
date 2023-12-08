@@ -24,9 +24,12 @@ application = get_wsgi_application()
 
 use_test_case = True
 num_of_rooms = 5
-wait = 10
+wait = 10 # 秒
 
 def create_central_AC():
+    '''
+    该函数用于创建中央空调对象
+    '''
     try:
         CentralAC.objects.all().delete()
     finally:
@@ -52,6 +55,11 @@ def create_central_AC():
         print('create central AC success')
 
 def create_admin(username='admin', password='admin'):
+    '''
+    该函数用于创建管理员对象
+    :param username: 用户名
+    :param password: 密码
+    '''
     if not CustomUser.objects.filter(is_superuser=True).exists():
         CustomUser.objects.create_superuser(username, 'admin@example.com', password)
         print('create admin success')
@@ -59,8 +67,14 @@ def create_admin(username='admin', password='admin'):
     print('admin already exists')
 
 def create_ACadmin(username, password):
+    '''
+    该函数用于创建空调管理员对象
+    :param username: 用户名
+    :param password: 密码
+    '''
     # 删除所有ACadmin对象
     CustomUser.objects.filter(role='acmanager').delete()
+    # 创建一个ACadmin对象
     user = CustomUser.objects.create(username=username, role='acmanager')
     user.set_password(password)
     user.save()
@@ -68,6 +82,10 @@ def create_ACadmin(username, password):
     return
 
 def create_room(num_of_rooms):
+    '''
+    该函数用于创建房间对象
+    :param num_of_rooms: 房间数量
+    '''
     try:
         # 删除所有Room对象
         Room.objects.all().delete()
@@ -81,6 +99,10 @@ def create_room(num_of_rooms):
         print('rooms already exists')
     
 def init_AC_info(num_of_rooms):
+    '''
+    该函数用于初始化空调信息
+    :param num_of_rooms: 房间数量
+    '''
     try:
         # 删除所有ACinfo对象
         ACinfo.objects.all().delete()
@@ -92,6 +114,11 @@ def init_AC_info(num_of_rooms):
 
 #创建前台服务员：receptionist
 def create_receptionist(username, password):
+    '''
+    该函数用于创建前台服务员对象
+    :param username: 用户名
+    :param password: 密码
+    '''
     CustomUser.objects.filter(role='receptionist').delete()
     user = CustomUser.objects.create(username=username, role='receptionist')
     user.set_password(password)
@@ -99,6 +126,10 @@ def create_receptionist(username, password):
     print('create receptionist success')
 
 def create_ACrecorddetail(num_of_rooms):
+    '''
+    该函数用于创建空调详单对象
+    :param num_of_rooms: 房间数量
+    '''
     try:
         # 删除
         ACrecorddetail.objects.all().delete()
@@ -113,23 +144,32 @@ def create_ACrecorddetail(num_of_rooms):
         print('AC record detail already exists')
 
 def delete_all_user():
+    '''
+    该函数用于删除所有用户
+    '''
     try:
         CustomUser.objects.all().delete()
     finally:
         print('delete all user success')
 
 def run_scheduler(wait):
+    '''
+    该函数用于运行调度器
+    :param wait: 调度器每次运行的间隔时间
+    '''
     count = 0
     while True:
         count += 1
         if not use_test_case:
             winsound.Beep(1000, 1000)
         time.sleep(wait)
+        # 调度器每wait秒运行一步
         scheduler.step()
         acs = ACinfo.objects.all()
         centralAC = CentralAC.objects.get()
         for roomNo in scheduler.rooms.keys():
             room = Room.objects.get(roomNo=roomNo)
+            # 未开房的不参与调度
             if room.room_status == 'occupied':
                 if roomNo in scheduler.service_queue:
                     status = 'running'
@@ -137,6 +177,7 @@ def run_scheduler(wait):
                     status = 'waiting'
                 else:
                     status = 'stopped'
+                # 从调度器中获取当前数据
                 current_temperature = scheduler.rooms[roomNo]['current_temperature']
                 target_temperature = scheduler.rooms[roomNo]['target_temperature']
                 total_fee = scheduler.rooms[roomNo]['current_cost']
@@ -161,6 +202,7 @@ def run_scheduler(wait):
                     new_record = ACrecorddetail.objects.create(roomNo=Room.objects.get(roomNo=roomNo))
                     new_record.request_time = request_time
                     new_record.save()
+                # 更新acInfo中的数据
                 ac.status = status
                 ac.current_temperature = round(current_temperature, 2)
                 ac.target_temperature = int(target_temperature)
@@ -169,6 +211,7 @@ def run_scheduler(wait):
                 ac.save()
 
         print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+' scheduler step ' + str(count))
+        # 清空request_queue
         scheduler.request_queue = []
 
 def room1(wait):
@@ -257,6 +300,7 @@ def test_case():
     room5_thread.start()
 
 try:
+    # 初始化数据库
     create_central_AC()
     delete_all_user()
     create_admin('admin', 'admin')

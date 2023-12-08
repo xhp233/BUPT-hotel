@@ -75,7 +75,7 @@
         $(document).ready(function(){
             setInterval(function(){
                 $("#needrefresh").load(location.href + " #needrefresh", function() {
-                    // 在这里获取 status
+                    // 获取 status
                     var status = document.getElementById('status').textContent;
 
                     // 更新表单的事件处理器
@@ -90,6 +90,7 @@
             $('#adjust-speed-form').off('submit');
             $('#adjust-temperature-form').off('submit');
 
+            // 添加新的事件处理器，根据状态判断是否阻止表单提交
             $('#power-on-form').on('submit', function(event) {
                 if (status !== "已停止") {
                     alert('空调已经开启，无法再次开启');
@@ -136,6 +137,8 @@
                 return !isNaN(parseFloat(n)) && isFinite(n);
             }
         }
+
+        // 调整温度的按钮
         document.getElementById('decrease').addEventListener('click', function () {
             var input = document.getElementById('target_temp');
             var display = document.getElementById('temperature-display');

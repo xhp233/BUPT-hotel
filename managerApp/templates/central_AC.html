@@ -16,6 +16,7 @@
                 <a href="../../logout/" class="btn btn-secondary">退出登录</a>
             </div>
         </div>
+        <!-- 根据状态显示不同页面 -->
         {% if centralAC_info.status == '关闭' %}
         <form method="post" action="/manager/centralAC/open/">
             {% csrf_token %}
@@ -67,6 +68,7 @@
         </form>
     {% endif %}
     <script>
+        // 点击开启按钮时，检查输入是否合法
         document.querySelector('form').addEventListener('submit', function(event) {
             var max_temperature = document.getElementById('max_temperature').value;
             var min_temperature = document.getElementById('min_temperature').value;

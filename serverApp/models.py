@@ -3,7 +3,7 @@ from ACPanelApp.models import Room
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-
+# 自定义用户类
 class CustomUser(AbstractUser):
     role = models.CharField(max_length=20) # resident, acmanager, receptionist, manager
     roomNo = models.ForeignKey(Room, on_delete=models.CASCADE, null=True)
@@ -22,7 +22,7 @@ class ACrecorddetail(models.Model):
     roomNo = models.ForeignKey(Room, on_delete=models.CASCADE)
     current_temperature = models.CharField(max_length=50,default='')
     target_temperature = models.CharField(max_length=50,default='')
-    speed = models.CharField(max_length=50,default='',choices=SPEED_CHOICES)# low, mid, high
+    speed = models.CharField(max_length=50,default='',choices=SPEED_CHOICES)
     start_time = models.DateTimeField(auto_now_add=True)
     end_time = models.DateTimeField(auto_now_add=True)
     request_time = models.DateTimeField(auto_now_add=True)
@@ -31,13 +31,3 @@ class ACrecorddetail(models.Model):
 
     class Meta:
         db_table = 'ac_record_detail'
-
-# 账单
-# class ACrecord(models.Model):
-#     roomNo = models.ForeignKey(Room, on_delete=models.CASCADE)
-#     start_time = models.DateTimeField(auto_now_add=True)
-#     end_time = models.DateTimeField(auto_now=True)
-#     fee = models.CharField(max_length=50,default='')
-
-#     class Meta:
-#         db_table = 'ac_record'

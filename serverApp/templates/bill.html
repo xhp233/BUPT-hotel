@@ -1,6 +1,5 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>详单</title>
@@ -90,12 +89,3 @@
     </script>
 </body>
 </html>
-<!--
----bill_Info---
-    roomNo = models.ForeignKey(Room, on_delete=models.CASCADE)
-    status = models.CharField(max_length=50,default='')
-    current_temperature = models.CharField(max_length=50,default='')
-    target_temperature = models.CharField(max_length=50,default='')
-    speed = models.CharField(max_length=50,default='')
-    time = models.DateTimeField(auto_now=True)
--->

@@ -1,6 +1,4 @@
-from django.db import models
-
-# Create your models here.      
+from django.db import models    
 
 class CentralAC(models.Model):
     MODE_CHOICES = (
@@ -13,8 +11,8 @@ class CentralAC(models.Model):
         ('off', '关闭'),
     )
 
-    mode = models.CharField(max_length=50,default='',choices=MODE_CHOICES) # cool or heat
-    status = models.CharField(max_length=50,default='',choices=STATUS_CHOICES) # on or off
+    mode = models.CharField(max_length=50,default='',choices=MODE_CHOICES)
+    status = models.CharField(max_length=50,default='',choices=STATUS_CHOICES)
     max_temperature = models.CharField(max_length=50,default='')
     min_temperature = models.CharField(max_length=50,default='')
     fee = models.CharField(max_length=50,default='')

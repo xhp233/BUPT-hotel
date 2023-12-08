@@ -7,6 +7,11 @@ from BUPTHotelAC.scheduler import scheduler
 
 @login_required
 def manager(request):
+    '''
+    该函数用于处理管理员界面的请求
+    :param request: 请求
+    :return: 渲染后的管理员界面
+    '''
     if request.user.role != 'acmanager':
         return HttpResponse('您没有权限访问该页面')
     if request.method == 'GET':
@@ -15,6 +20,11 @@ def manager(request):
 
 @login_required
 def manager_get_data(request):
+    '''
+    该函数用于处理管理员界面的获取数据请求
+    :param request: 请求
+    :return: json格式的数据
+    '''
     if request.user.role != 'acmanager':
         return HttpResponse('您没有权限访问该页面')
     if request.method == 'GET':
@@ -38,9 +48,15 @@ def manager_get_data(request):
 
 @login_required
 def central_AC(request):
+    '''
+    该函数用于处理中央空调界面的请求
+    :param request: 请求
+    :return: 渲染后的中央空调界面
+    '''
     if request.user.role != 'acmanager':
         return HttpResponse('您没有权限访问该页面')
     if request.method == 'GET':
+        # 获取中央空调的信息
         centralAC_info = CentralAC.objects.get()
         centralAC_info.mode = centralAC_info.get_mode_display()
         centralAC_info.status = centralAC_info.get_status_display()
@@ -50,14 +66,21 @@ def central_AC(request):
     
 @login_required
 def open_central_AC(request):
+    '''
+    该函数用于处理开启中央空调的请求
+    :param request: 请求
+    :return: 重定向到中央空调界面
+    '''
     if request.user.role != 'acmanager':
         return HttpResponse('您没有权限访问该页面')
     if request.method == 'POST':
+        # 获取中央空调的信息
         mode = request.POST.get('mode')
         max_temperature = request.POST.get('max_temperature')
         min_temperature = request.POST.get('min_temperature')
         fee = request.POST.get('fee')
         default_target_temperature = request.POST.get('default_target_temperature')
+        # 将中央空调的信息保存到数据库
         centralAC_info = CentralAC.objects.get()
         centralAC_info.status = 'on'
         centralAC_info.mode = mode
@@ -66,6 +89,7 @@ def open_central_AC(request):
         centralAC_info.fee = fee
         centralAC_info.default_target_temperature = default_target_temperature
         centralAC_info.save()
+        # 同步给调度器
         scheduler.set_params(default_target_temperature, fee, 1.0, 1 if mode == 'heat' else -1)
         return redirect('/manager/centralAC/')
     else:
@@ -73,14 +97,22 @@ def open_central_AC(request):
 
 @login_required
 def close_central_AC(request):
+    '''
+    该函数用于处理关闭中央空调的请求
+    :param request: 请求
+    :return: 重定向到中央空调界面
+    '''
     if request.user.role != 'acmanager':
         return HttpResponse('您没有权限访问该页面')
     if request.method == 'POST':
+        # 获取中央空调的信息
         central_AC = CentralAC.objects.get()
+        # 将中央空调的信息保存到数据库
         if central_AC.status == 'off':
             return JsonResponse({'message': '中央空调未开启'})
         central_AC.status = 'off'
         central_AC.save()
+        # 关闭所有空调
         acs = ACinfo.objects.all()
         for ac in acs:
             ac.status = 'stopped'

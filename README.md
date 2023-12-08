@@ -1,10 +1,12 @@
 # 运行服务器
 
-先运行deleteDB.bat，然后再运行runserver.bat
+对于windows系统：先运行deleteDB.bat，然后再运行runserver.bat
+
+对于linux系统：先运行deleteDB.sh，然后再运行runserver.sh
 
 要在同一浏览器登录不同账号，建议使用火狐的多身份标签页功能
 
-没有的话就用不同浏览器登录（
+没有的话就用不同浏览器登录
 
 # 默认账号密码
 
@@ -14,63 +16,24 @@
 
 前台服务员：receptionist receptionist
 
-# 为某一功能实现前后端
+# 各模块功能及组员分工
 
-1. 在...App文件夹中的views.py里定义后端函数
-2. 在BUPTHotelAC文件夹中的urls.py中绑定后端函数响应的网址
+## ACPanelApp - 王宇航
 
-# ...App
+负责空调面板的显示和控制，向调度器发送请求。
 
-## \_\_init\_\_.py
+## managerApp - 徐逅普
 
-空的，不用动
+负责空调管理员模块，包括开关中央空调、设置中央空调状态、监控客房空调信息。
 
-## admin.py
+## serverApp - 王颂州
 
-一般不需要写东西，仅当注册管理员类时要写
+负责用户登入登出、前台开房退房及出示账单详单。
 
-## apps.py
+## BUPTHotelAC.scheduler.py - 高明翰
 
-一般不需要写东西，注册app用，已写好
+负责调度器，接收空调面板的请求，按优先级+时间片+FIFO调度。
 
-## models.py
+## BUPTHotelAC.wsgi.py - 徐逅普
 
-定义用到的数据库结构
-
-## tests.py
-
-一般不需要写东西，写测试用例用
-
-## views.py
-
-写对于某一网址的响应函数
-
-## static（文件夹）
-
-存放css、js文件，默认不存在，需自己创建
-
-## templates（文件夹）
-
-存放html文件，默认不存在，需自己创建
-
-## migrations（文件夹）
-
-平常不要动
-
-# BUPTHotelAC
-
-## asgi.py
-
-没用
-
-## settings.py
-
-全局设置
-
-## urls.py
-
-注册网址与后端的响应函数的绑定关系
-
-## wsgi.py
-
-每次启动服务器时自动运行，内含一些初始化操作
+负责数据库与调度器的初始化，内含测试用例脚本。
