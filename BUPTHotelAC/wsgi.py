@@ -22,7 +22,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'BUPTHotelAC.settings')
 
 application = get_wsgi_application()
 
-use_test_case = False
+use_test_case = True
 num_of_rooms = 5
 wait = 10
 
@@ -122,8 +122,9 @@ def run_scheduler(wait):
     count = 0
     while True:
         count += 1
-        winsound.Beep(1000, 1000)
-        time.sleep(wait)        
+        if not use_test_case:
+            winsound.Beep(1000, 1000)
+        time.sleep(wait)
         scheduler.step()
         acs = ACinfo.objects.all()
         centralAC = CentralAC.objects.get()
@@ -171,7 +172,6 @@ def run_scheduler(wait):
         scheduler.request_queue = []
 
 def room1(wait):
-    time.sleep(3)
     scheduler.start_air_conditioning('1')
     time.sleep(wait)
     scheduler.set_target_temperature('1', 24)
@@ -187,7 +187,6 @@ def room1(wait):
     scheduler.stop_air_conditioning('1')
 
 def room2(wait):
-    time.sleep(4)
     time.sleep(wait)
     scheduler.start_air_conditioning('2')
     time.sleep(2*wait)
@@ -201,7 +200,6 @@ def room2(wait):
     scheduler.stop_air_conditioning('2')
 
 def room3(wait):
-    time.sleep(5)
     time.sleep(2*wait)
     scheduler.start_air_conditioning('3')
     time.sleep(2*wait)
@@ -214,7 +212,6 @@ def room3(wait):
     scheduler.stop_air_conditioning('3')
 
 def room4(wait):
-    time.sleep(6)
     time.sleep(3*wait)
     scheduler.start_air_conditioning('4')
     time.sleep(6*wait)
@@ -227,7 +224,6 @@ def room4(wait):
     scheduler.stop_air_conditioning('4')
 
 def room5(wait):
-    time.sleep(7)
     time.sleep(3*wait)
     scheduler.start_air_conditioning('5')
     time.sleep(wait)
@@ -249,10 +245,15 @@ def test_case():
     room3_thread = threading.Thread(target=room3, args=(wait,))
     room4_thread = threading.Thread(target=room4, args=(wait,))
     room5_thread = threading.Thread(target=room5, args=(wait,))
+    time.sleep(3)
     room1_thread.start()
+    time.sleep(1)
     room2_thread.start()
+    time.sleep(1)
     room3_thread.start()
+    time.sleep(1)
     room4_thread.start()
+    time.sleep(1)
     room5_thread.start()
 
 try:
